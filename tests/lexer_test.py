@@ -41,3 +41,65 @@ class LexerTest(TestCase):
             Token(TokenType.ILLEGAL, '+'),
             Token(TokenType.EOF, ''),
         ]
+
+        self.assertEquals(tokens, expected_tokens)
+
+    
+    def test_comment_line(self) -> None:
+        source: str = '// This is a comment\n'
+        lexer: Lexer = Lexer(source)
+
+        tokens: List[Token] = []
+        for i in range(1):
+            tokens.append(lexer.next_token())
+
+        expected_tokens: List[Token] = [
+            Token(TokenType.EOF, ''),
+        ]
+
+        self.assertEquals(tokens, expected_tokens)
+
+    def test_comment_block(self) -> None:
+        source: str = '''
+        /*
+        This is a comment
+        */
+        '''
+        lexer: Lexer = Lexer(source)
+
+        tokens: List[Token] = []
+        for i in range(3):
+            tokens.append(lexer.next_token())
+
+        expected_tokens: List[Token] = [
+            Token(TokenType.OPEN_BLOCK_COMMENT, '/*'),
+            Token(TokenType.CLOSE_BLOCK_COMMENT, '*/'),
+            Token(TokenType.EOF, ''),
+            
+        ]
+
+        self.assertEquals(tokens, expected_tokens)
+
+    def test_line_comment_and_block_comment(self) -> None:
+
+        source: str = '''
+        // This is a comment
+        /*
+        This is a comment
+        */
+        '''
+
+        lexer: Lexer = Lexer(source)
+
+        tokens: List[Token] = []
+
+        for i in range(3):
+            tokens.append(lexer.next_token())
+
+        expected_tokens: List[Token] = [
+            Token(TokenType.OPEN_BLOCK_COMMENT, '/*'),
+            Token(TokenType.CLOSE_BLOCK_COMMENT, '*/'),
+            Token(TokenType.EOF, ''),
+        ]
+
+        self.assertEquals(tokens, expected_tokens)

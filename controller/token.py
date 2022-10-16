@@ -9,8 +9,8 @@ from typing import Dict, NamedTuple
 @unique
 class TokenType(Enum):
     """Token types"""
-    CLOSE_MULTI_COMMENT = auto()
     CLOSE_TAG = auto()
+    CLOSE_BLOCK_COMMENT = auto()
     COMMA = auto()
     CONTROL = auto()
     DOT = auto()
@@ -20,11 +20,10 @@ class TokenType(Enum):
     INT = auto()
     ILLEGAL = auto()
     LPAREN = auto()
-    OPEN_MULTI_COMMENT = auto()
     OPEN_TAG = auto()
+    OPEN_BLOCK_COMMENT = auto()
     RPAREN = auto()
     SEMICOLON = auto()
-    SIMPLE_COMMENT = auto()
     SINGLE_QUOTE = auto()
     STRING = auto()
     TRUE = auto()
