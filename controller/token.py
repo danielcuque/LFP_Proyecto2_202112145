@@ -3,7 +3,7 @@ from enum import (
     auto,
     unique,
 )
-from typing import Dict
+from typing import Dict, NamedTuple
 
 
 @unique
@@ -14,8 +14,11 @@ class TokenType(Enum):
     COMMA = auto()
     CONTROL = auto()
     DOT = auto()
+    EOF = auto()
     FALSE = auto()
     IDENT = auto()
+    INT = auto()
+    ILLEGAL = auto()
     LPAREN = auto()
     OPEN_MULTI_COMMENT = auto()
     OPEN_TAG = auto()
@@ -27,18 +30,12 @@ class TokenType(Enum):
     TRUE = auto()
 
 
-class Token:
-    """Token class"""
+class Token(NamedTuple):
+    token_type: TokenType
+    literal: str
 
-    def __init__(self, token_type, literal):
-        self.token_type = token_type
-        self.literal = literal
-
-    def __str__(self):
-        return f"Token({self.token_type}, {self.literal})"
-
-    def __repr__(self):
-        return self.__str__()
+    def __str__(self) -> str:
+        return f'Type: {self.token_type}, Literal: {self.literal}'
 
 
 def lookup_token_type(literal: str) -> TokenType:
