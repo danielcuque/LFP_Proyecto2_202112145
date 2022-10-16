@@ -26,7 +26,7 @@ class Lexer:
         self._skip_whitespace()
 
         if self._skip_characters:
-            
+
             while (self._character != '*' or self._peek_character() != '/') and self._character != '':
                 self._read_character()
                 self._skip_characters = False
@@ -52,19 +52,19 @@ class Lexer:
                 self._skip_characters = True
             else:
                 token = Token(TokenType.ILLEGAL, self._character)
-        
         elif self._character == '*':
             if self._peek_character() == '/':
                 token = self._make_two_character_token(
                     TokenType.CLOSE_BLOCK_COMMENT)
             else:
                 token = Token(TokenType.ILLEGAL, self._character)
-        
         elif self._character.isalpha():
             literal = self._read_identifier()
             token_type = lookup_token_type(literal)
-            token = Token(token_type, literal)
-
+            return Token(token_type, literal)
+        elif self._character.isdigit():
+            literal = self._read_number()
+            return Token(TokenType.INT, literal)
         elif self._character == '':
             token = Token(TokenType.EOF, '')
         else:
@@ -91,7 +91,7 @@ class Lexer:
             self._character = ''
         else:
             self._character = self._source[self._read_position]
-        
+
         if self._character == '\n':
             self._row += 1
             self._column = 0

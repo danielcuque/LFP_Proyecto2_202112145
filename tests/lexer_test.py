@@ -136,18 +136,32 @@ class LexerTest(TestCase):
         self.assertEquals(tokens, expected_tokens)
 
     def test_control_statement(self) -> None:
-        source: str = 'true false'
+        source: str = 'Boton1.setColorFondo(64, 64, 64);'
 
         lexer: Lexer = Lexer(source)
 
         tokens: List[Token] = []
 
-        for i in range(2):
+        for i in range(12):
             tokens.append(lexer.next_token())
 
+        print(tokens)
+
         expected_tokens: List[Token] = [
-            Token(TokenType.TRUE, 'true'),
-            Token(TokenType.FALSE, 'false'),
+            Token(TokenType.IDENT, 'Boton1'),
+            Token(TokenType.DOT, '.'),
+            Token(TokenType.IDENT, 'setColorFondo'),
+            Token(TokenType.LPAREN, '('),
+            Token(TokenType.INT, '64'),
+            Token(TokenType.COMMA, ','),
+            Token(TokenType.INT, '64'),
+            Token(TokenType.COMMA, ','),
+            Token(TokenType.INT, '64'),
+            Token(TokenType.RPAREN, ')'),
+            Token(TokenType.SEMICOLON, ';'),
+            Token(TokenType.EOF, ''),
         ]
+
+        self.assertEquals(tokens, expected_tokens)
 
         

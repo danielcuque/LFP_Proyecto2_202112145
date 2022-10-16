@@ -22,6 +22,7 @@ class TokenType(Enum):
     LPAREN = auto()
     OPEN_TAG = auto()
     OPEN_BLOCK_COMMENT = auto()
+    PROPERTY = auto()
     RPAREN = auto()
     SEMICOLON = auto()
     SINGLE_QUOTE = auto()
