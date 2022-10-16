@@ -12,6 +12,9 @@ class Lexer:
         self._character: str = ''
         self._position: int = 0
         self._read_position: int = 0
+
+        self._row: int = 0
+        self._column: int = 0
         self._read_character()
 
     states: List[str] = []
@@ -22,16 +25,10 @@ class Lexer:
         self._skip_whitespace()
 
         if self._skip_characters:
-            self._skip_characters = False
-            while self._character != '*' and self._peek_character() != '/' and self._character != '':
+            
+            while (self._character != '*' or self._peek_character() != '/') and self._character != '':
                 self._read_character()
-            if self._character == '':
-                return Token(TokenType.EOF, '')
-
-            token = self._make_two_character_token(
-                TokenType.CLOSE_BLOCK_COMMENT)
-            self._read_character()
-            return token
+                self._skip_characters = False
 
         if self._character == '(':
             token = Token(TokenType.LPAREN, self._character)
@@ -43,14 +40,20 @@ class Lexer:
             token = Token(TokenType.COMMA, self._character)
         elif self._character == '/':
             if self._peek_character() == '/':
-                while self._character != '\n':
+                while self._character != '\n' and self._character != '':
                     self._read_character()
                 return self.next_token()
             elif self._peek_character() == "*":
                 token = self._make_two_character_token(
                     TokenType.OPEN_BLOCK_COMMENT)
                 self._skip_characters = True
-                self._read_character()
+            else:
+                token = Token(TokenType.ILLEGAL, self._character)
+        
+        elif self._character == '*':
+            if self._peek_character() == '/':
+                token = self._make_two_character_token(
+                    TokenType.CLOSE_BLOCK_COMMENT)
             else:
                 token = Token(TokenType.ILLEGAL, self._character)
         elif self._character == '':
@@ -79,7 +82,12 @@ class Lexer:
             self._character = ''
         else:
             self._character = self._source[self._read_position]
+        
+        if self._character == '\n':
+            self._row += 1
+            self._column = 0
 
+        self._column += 1
         self._position = self._read_position
         self._read_position += 1
 

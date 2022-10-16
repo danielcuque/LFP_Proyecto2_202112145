@@ -46,7 +46,7 @@ class LexerTest(TestCase):
 
     
     def test_comment_line(self) -> None:
-        source: str = '// This is a comment\n'
+        source: str = '// This is a comment'
         lexer: Lexer = Lexer(source)
 
         tokens: List[Token] = []
@@ -84,8 +84,12 @@ class LexerTest(TestCase):
 
         source: str = '''
         // This is a comment
+        // This is another comment
         /*
-        This is a comment
+        Multi
+        line
+        comment/////
+        /*
         */
         '''
 
@@ -96,6 +100,8 @@ class LexerTest(TestCase):
         for i in range(3):
             tokens.append(lexer.next_token())
 
+        print(tokens)
+
         expected_tokens: List[Token] = [
             Token(TokenType.OPEN_BLOCK_COMMENT, '/*'),
             Token(TokenType.CLOSE_BLOCK_COMMENT, '*/'),
@@ -103,3 +109,5 @@ class LexerTest(TestCase):
         ]
 
         self.assertEquals(tokens, expected_tokens)
+
+        
