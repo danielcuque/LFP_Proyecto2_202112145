@@ -90,6 +90,7 @@ class LexerTest(TestCase):
         line
         comment/////
         /*
+        52136789∑©√ß∂∫
         */
         '''
 
@@ -109,5 +110,44 @@ class LexerTest(TestCase):
         ]
 
         self.assertEquals(tokens, expected_tokens)
+
+    
+    def test_fail_multi_comment(self) -> None:
+        source: str = '''
+        /*
+        This is a comment
+        /*
+        This is a comment
+        */
+        '''
+        lexer: Lexer = Lexer(source)
+
+        tokens: List[Token] = []
+        for i in range(3):
+            tokens.append(lexer.next_token())
+
+        expected_tokens: List[Token] = [
+            Token(TokenType.OPEN_BLOCK_COMMENT, '/*'),
+            Token(TokenType.CLOSE_BLOCK_COMMENT, '*/'),
+            Token(TokenType.EOF, ''),
+            
+        ]
+
+        self.assertEquals(tokens, expected_tokens)
+
+    def test_control_statement(self) -> None:
+        source: str = 'true false'
+
+        lexer: Lexer = Lexer(source)
+
+        tokens: List[Token] = []
+
+        for i in range(2):
+            tokens.append(lexer.next_token())
+
+        expected_tokens: List[Token] = [
+            Token(TokenType.TRUE, 'true'),
+            Token(TokenType.FALSE, 'false'),
+        ]
 
         

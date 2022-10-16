@@ -2,6 +2,7 @@ from typing import List
 from controller.token import (
     Token,
     TokenType,
+    lookup_token_type
 )
 
 
@@ -38,6 +39,8 @@ class Lexer:
             token = Token(TokenType.SEMICOLON, self._character)
         elif self._character == ',':
             token = Token(TokenType.COMMA, self._character)
+        elif self._character == '.':
+            token = Token(TokenType.DOT, self._character)
         elif self._character == '/':
             if self._peek_character() == '/':
                 while self._character != '\n' and self._character != '':
@@ -56,6 +59,12 @@ class Lexer:
                     TokenType.CLOSE_BLOCK_COMMENT)
             else:
                 token = Token(TokenType.ILLEGAL, self._character)
+        
+        elif self._character.isalpha():
+            literal = self._read_identifier()
+            token_type = lookup_token_type(literal)
+            token = Token(token_type, literal)
+
         elif self._character == '':
             token = Token(TokenType.EOF, '')
         else:
@@ -93,8 +102,11 @@ class Lexer:
 
     def _read_identifier(self) -> str:
         position = self._position
-        while self._character.isalpha():
+
+        is_first_letter = True
+        while self._character.isalpha() or (not is_first_letter and self._character.isdigit()):
             self._read_character()
+            is_first_letter = False
         return self._source[position:self._position]
 
     def _read_number(self) -> str:
