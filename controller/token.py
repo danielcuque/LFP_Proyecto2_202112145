@@ -3,24 +3,28 @@ from enum import (
     auto,
     unique,
 )
+from typing import Dict
 
 
 @unique
 class TokenType(Enum):
     """Token types"""
+    CLOSE_MULTI_COMMENT = auto()
     CLOSE_TAG = auto()
+    COMMA = auto()
     CONTROL = auto()
     DOT = auto()
-    DOUBLE_QUOTE = auto()
+    FALSE = auto()
     IDENT = auto()
     LPAREN = auto()
-    MULTI_COMMENT = auto()
+    OPEN_MULTI_COMMENT = auto()
     OPEN_TAG = auto()
     RPAREN = auto()
     SEMICOLON = auto()
-    SINGLE_COMMENT = auto()
+    SIMPLE_COMMENT = auto()
     SINGLE_QUOTE = auto()
-    WRAPPER = auto()
+    STRING = auto()
+    TRUE = auto()
 
 
 class Token:
@@ -35,3 +39,11 @@ class Token:
 
     def __repr__(self):
         return self.__str__()
+
+
+def lookup_token_type(literal: str) -> TokenType:
+    keywords: Dict[str, TokenType] = {
+        'true': TokenType.TRUE,
+        'false': TokenType.FALSE,
+    }
+    return keywords.get(literal, TokenType.IDENT)
