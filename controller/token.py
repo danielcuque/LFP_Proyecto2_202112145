@@ -14,6 +14,7 @@ class TokenType(Enum):
     COMMA = auto()
     CONTROL = auto()
     DOT = auto()
+    DOUBLE_QUOTE = auto()
     EOF = auto()
     FALSE = auto()
     IDENT = auto()
@@ -26,7 +27,6 @@ class TokenType(Enum):
     RPAREN = auto()
     SEMICOLON = auto()
     SINGLE_QUOTE = auto()
-    STRING = auto()
     TRUE = auto()
 
 
