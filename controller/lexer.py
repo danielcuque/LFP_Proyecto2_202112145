@@ -26,7 +26,6 @@ class Lexer:
         self._skip_whitespace()
 
         if self._skip_characters:
-
             while (self._character != '*' or self._peek_character() != '/') and self._character != '':
                 self._read_character()
                 self._skip_characters = False
@@ -52,6 +51,12 @@ class Lexer:
                 self._skip_characters = True
             else:
                 token = Token(TokenType.ILLEGAL, self._character)
+        elif self._character == '<':
+            token = self._read_open_tag()
+            print(f'Open tag: {token}')
+        elif self._character == '-':
+            token = self._read_close_tag()
+
         elif self._character == '*':
             if self._peek_character() == '/':
                 token = self._make_two_character_token(
@@ -99,6 +104,32 @@ class Lexer:
         self._column += 1
         self._position = self._read_position
         self._read_position += 1
+
+    def _read_close_tag(self) -> Token:
+        initial_position = self._position
+        self._read_character()
+        if self._character == '-':
+            self._read_character()
+            if self._character == '>':
+                return Token(TokenType.CLOSE_TAG, self._source[initial_position:self._position+1])
+            else:
+                return Token(TokenType.ILLEGAL, self._source[initial_position:self._position+1])
+        else:
+            return Token(TokenType.ILLEGAL, self._source[initial_position:self._position+1])
+
+    def _read_open_tag(self) -> Token:
+        initial_position = self._position
+        if self._peek_character() != '!':
+            return Token(TokenType.ILLEGAL, self._character)
+        self._read_character() # !
+        if self._peek_character() != '-':
+            return Token(TokenType.ILLEGAL, self._source[initial_position:self._position+1])
+        self._read_character() # -
+        if self._peek_character() != '-':
+            return Token(TokenType.ILLEGAL, self._source[initial_position:self._position+1])
+        self._read_character() # -
+        return Token(TokenType.OPEN_TAG, self._source[initial_position:self._position+1])
+
 
     def _read_identifier(self) -> str:
         position = self._position
