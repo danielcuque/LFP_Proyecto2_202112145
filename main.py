@@ -8,7 +8,7 @@ from controller.token import Token, TokenType
 
 def main():
     source: str = '''
-                    <!--Controles
+                    <!-- Controles
             Contenedor contlogin;
             Contenedor contFondo; 
             Boton cmdIngresar; 

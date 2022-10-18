@@ -164,7 +164,7 @@ class LexerTest(TestCase):
         expected_tokens: List[Token] = [
             Token(TokenType.IDENT, 'Boton1'),
             Token(TokenType.DOT, '.'),
-            Token(TokenType.IDENT, 'setColorFondo'),
+            Token(TokenType.FUNCTION, 'setColorFondo'),
             Token(TokenType.LPAREN, '('),
             Token(TokenType.INT, '64'),
             Token(TokenType.COMMA, ','),
@@ -288,123 +288,75 @@ class LexerTest(TestCase):
 
         self.assertEquals(tokens, expected_tokens)
 
-    def test_total_program(self) -> None:
+    
+    def test_strings(self) -> None:
         source: str = '''
-                    <!--Controles
-            Contenedor contlogin;
-            Contenedor contFondo; 
-            Boton cmdIngresar; 
-            Clave pswClave;
-            Etiqueta passw;
-            Etiqueta Nombre;
-            Texto Texto0;
-            Contenedor contlogo2;
-            Contenedor ContLogo1;
-            Contenedor ContBody;
-            Controles -->
-
-            <!--propiedades
-            /*
-            Definicion de propiedades
-            */
-
-            //#$inicio de contlogin 
-            contlogin.setAncho(190); 
-            contlogin.setAlto(150);
-            contlogin.setColorFondo(47,79,79); 
-            //#$fin de contlogin
-
-            //#$inicio de contFondo 
-            contFondo.setAncho(800);
-            contFondo.setAlto(100); 
-            contFondo.setColorFondo(64,64,64);
-            //#$fin de contFondo
-
-            //#$inicio de cmdIngresar 
-            cmdIngresar.setTexto("Ingresar"); 
-            contlogin.add(cmdIngresar);
-            //#$fin de cmdIngresar
-
-            //#$inicio de pswClave 
-            pswClave.setTexto("");
-            //#$fin de pswClave 
-
-            //#$inicio de etiqueta passw
-            passw.setAncho(53); 
-            passw.setAlto(13 ); 
-            passw.setColorLetra(128,128,128);
-            passw.setTexto("Password");
-            //#$fin de passw
-
-            //#$inicio de Nombre
-            Nombre.setAncho(44); 
-            Nombre.setAlto(13);
-            Nombre.setColorLetra(128,128,128); 
-            Nombre.setTexto("Nombre");
-            //#$fin de Nombre
-
-            //#$inicio de JTextField0 
-            JTextField0.setTexto("");
-            //#$fin de JTextField0
-
-            //#$inicio de contlogo2 
-            contlogo2.setAncho(150); 
-            contlogo2.setAlto( 50);
-            contlogo2.setColorFondo(0,128,128); 
-            //#$fin de contlogo2
-
-            //#$inicio de ContLogo1 
-            ContLogo1.setAncho(50);
-            ContLogo1.setAlto( 50); 
-            ContLogo1.setColorFondo(64,64,64);
-            //#$fin de ContLogo1
-
-            //#$inicio de ContBody 
-            ContBody.setAncho(800);
-            ContBody.setAlto(300); 
-            ContBody.setColorFondo(64,224,208);
-            //#$fin de ContBody
-            propiedades -->
-
-            <!--Colocacion
-            /*
-            Posicionamiento de los controles
-            */
-
-            contFondo.setPosicion(25,330); 
-            this.add(contFondo);
-            contlogin.setPosicion(586,110); 
-            ContBody.add(contlogin);
-            passw.setPosicion(11,54); 
-            contlogin.add(passw); 
-            cmdIngresar.setPosicion(40,100);
-            pswClave.setPosicion(67,48); 
-            contlogin.add(pswClave);
-
-            Nombre.setPosicion(8,21);
-            contlogin.add(Nombre);
-            JTextField0.setPosicion(65,20); 
-            contlogin.add(JTextField0);
-            contlogo2.setPosicion(88,25); 
-            ContBody.add(contlogo2);
-            ContLogo1.setPosicion(36,25); 
-            ContBody.add(ContLogo1);
-            ContBody.setPosicion(23,21); 
-            this.add(ContBody);
-            Colocacion -->
-                    '''
-
-        tokens: List[Token] = []
+            "Password 1";
+        '''
 
         lexer: Lexer = Lexer(source)
 
-        EOF_TOKEN = Token(TokenType.EOF, '')
-        while True:
-            token: Token = lexer.next_token()
-            tokens.append(token)
-            if token == EOF_TOKEN:
-                break
-            
+        tokens: List[Token] = []
+
+        for i in range(2):
+            tokens.append(lexer.next_token())
+
+        expected_tokens: List[Token] = [
+            Token(TokenType.STRING, "Password 1"),
+            Token(TokenType.SEMICOLON, ';'),
+        ]
+
+        self.assertEquals(tokens, expected_tokens)
+
+    def test_justify_values(self) -> None:
+        source: str = '''
+        boton1.setAlineacion(Centro);
+        '''
+
+        lexer: Lexer = Lexer(source)
+
+        tokens: List[Token] = []
+
+        for i in range(7):
+            tokens.append(lexer.next_token())
+
+        expected_tokens: List[Token] = [
+            Token(TokenType.IDENT, 'boton1'),
+            Token(TokenType.DOT, '.'),
+            Token(TokenType.FUNCTION, 'setAlineacion'),
+            Token(TokenType.LPAREN, '('),
+            Token(TokenType.JUSTIFY, 'Centro'),
+            Token(TokenType.RPAREN, ')'),
+            Token(TokenType.SEMICOLON, ';'),
+        ]
+
+        self.assertEquals(tokens, expected_tokens)
+
+    def test_keywords(self) -> None:
+        source: str = '''
+        this.add(contFondo);
+        '''
+
+        lexer: Lexer = Lexer(source)
+
+        tokens: List[Token] = []
+
+        for i in range(7):
+            tokens.append(lexer.next_token())
+
+        expected_tokens: List[Token] = [
+            Token(TokenType.THIS, 'this'),
+            Token(TokenType.DOT, '.'),
+            Token(TokenType.FUNCTION, 'add'),
+            Token(TokenType.LPAREN, '('),
+            Token(TokenType.IDENT, 'contFondo'),
+            Token(TokenType.RPAREN, ')'),
+            Token(TokenType.SEMICOLON, ';'),
+        ]
+
+        self.assertEquals(tokens, expected_tokens)
+
+
 
 
         

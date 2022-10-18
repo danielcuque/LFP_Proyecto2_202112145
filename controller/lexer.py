@@ -29,7 +29,6 @@ class Lexer:
             while (self._character != '*' or self._peek_character() != '/') and self._character != '':
                 self._read_character()
                 self._skip_characters = False
-
         if self._character == '(':
             token = Token(TokenType.LPAREN, self._character)
         elif self._character == ')':
@@ -41,9 +40,9 @@ class Lexer:
         elif self._character == '.':
             token = Token(TokenType.DOT, self._character)
         elif self._character == '\"':
-            token = Token(TokenType.DOUBLE_QUOTE, self._character)
-        elif self._character == '\'':
-            token = Token(TokenType.SINGLE_QUOTE, self._character)
+            literal = self._read_string()
+
+            return Token(TokenType.STRING, literal)
         elif self._character == '/':
             if self._peek_character() == '/':
                 while self._character != '\n' and self._character != '':
@@ -120,6 +119,15 @@ class Lexer:
         else:
             return Token(TokenType.ILLEGAL, self._source[initial_position:self._position+1])
 
+    def _read_identifier(self) -> str:
+        position = self._position
+
+        is_first_letter = True
+        while self._character.isalpha() or (not is_first_letter and self._character.isdigit()):
+            self._read_character()
+            is_first_letter = False
+        return self._source[position:self._position]
+
     def _read_open_tag(self) -> Token:
         initial_position = self._position
         if self._peek_character() != '!':
@@ -133,20 +141,25 @@ class Lexer:
         self._read_character()  # -
         return Token(TokenType.OPEN_TAG, self._source[initial_position:self._position+1])
 
-    def _read_identifier(self) -> str:
-        position = self._position
-
-        is_first_letter = True
-        while self._character.isalpha() or (not is_first_letter and self._character.isdigit()):
-            self._read_character()
-            is_first_letter = False
-        return self._source[position:self._position]
-
     def _read_number(self) -> str:
         position = self._position
         while self._character.isdigit():
             self._read_character()
         return self._source[position:self._position]
+
+    def _read_string(self) -> str:
+        self._read_character()
+
+        initial_position =  self._position
+        while self._character != '\"' \
+            and self._position <=  len(self._source):
+            self._read_character()
+
+        string = self._source[initial_position:self._position]
+
+        self._read_character()
+
+        return string
 
     def _skip_whitespace(self) -> None:
         while self._character.isspace():
