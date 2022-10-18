@@ -10,16 +10,12 @@ from controller.token import (
 
 class Parser:
     def __init__(self, lexer: Lexer) -> None:
-        pass
-    #     self._lexer = lexer
-    #     self._current_token = Optional[Token] = None
-    #     self._peek_token = Optional[Token] = None
-    #     self._errors: List[str] = []
+        self._lexer = lexer
+        self._current_token: Optional[Token] = None
+        self._peek_token: Optional[Token] = None
+        self._errors: List[str] = []
+        self._stack: List[str] = []
 
-    # @property
-    # def errors(self) -> List[str]:
-    #     return self._errors
-
-    # def _advance_tokens(self) -> None:
-    #     self._current_token = self._peek_token
-    #     self._peek_token = self._lexer.next_token()
+    def _advance_tokens(self) -> None:
+        self._current_token = self._peek_token
+        self._peek_token = self._lexer.next_token()

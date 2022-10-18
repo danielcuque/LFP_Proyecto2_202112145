@@ -56,7 +56,6 @@ class Lexer:
                 token = Token(TokenType.ILLEGAL, self._character)
         elif self._character == '<':
             token = self._read_open_tag()
-            print(f'Open tag: {token}')
         elif self._character == '-':
             token = self._read_close_tag()
         elif self._character == '*':
@@ -109,15 +108,15 @@ class Lexer:
 
     def _read_close_tag(self) -> Token:
         initial_position = self._position
-        self._read_character()
-        if self._character == '-':
-            self._read_character()
-            if self._character == '>':
-                return Token(TokenType.CLOSE_TAG, self._source[initial_position:self._position+1])
-            else:
-                return Token(TokenType.ILLEGAL, self._source[initial_position:self._position+1])
-        else:
+        if self._peek_character() != '-':
+            return Token(TokenType.ILLEGAL, self._character)
+        self._read_character()  # -
+
+        if self._peek_character() != '>':
             return Token(TokenType.ILLEGAL, self._source[initial_position:self._position+1])
+        self._read_character()  # >
+
+        return Token(TokenType.CLOSE_TAG, self._source[initial_position:self._position+1])
 
     def _read_identifier(self) -> str:
         position = self._position
@@ -150,9 +149,9 @@ class Lexer:
     def _read_string(self) -> str:
         self._read_character()
 
-        initial_position =  self._position
+        initial_position = self._position
         while self._character != '\"' \
-            and self._position <=  len(self._source):
+                and self._position <= len(self._source):
             self._read_character()
 
         string = self._source[initial_position:self._position]

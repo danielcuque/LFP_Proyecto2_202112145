@@ -7,7 +7,6 @@ from controller.token import (
 
 EOF_TOKEN: Token = Token(TokenType.EOF, '')
 
-
 def start_repl(source: str) -> None:
     lexer: Lexer = Lexer(source)
 

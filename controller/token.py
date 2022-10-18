@@ -28,7 +28,6 @@ class TokenType(Enum):
     SEMICOLON = auto()
     STRING = auto()
     TRUE = auto()
-    THIS = auto()
     WRAPPER = auto()
 
 
@@ -82,6 +81,5 @@ def lookup_token_type(literal: str) -> TokenType:
     keywords: Dict[str, TokenType] = {
         'true': TokenType.TRUE,
         'false': TokenType.FALSE,
-        'this': TokenType.THIS,
     }
     return keywords.get(literal, TokenType.IDENT)
