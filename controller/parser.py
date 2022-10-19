@@ -2,7 +2,9 @@ from typing import List, Optional
 from controller.lexer import Lexer
 
 from controller.ast import (
-    Identifier,
+    Block,
+    BlockStatement,
+    Boolean,
     LetStatement,
     Program,
     Statement,
@@ -58,28 +60,45 @@ class Parser:
     def _expected_token_error(self, token_type: TokenType) -> None:
         assert self._peek_token is not None
         error = f'Se esperaba que el siguiente token fuera {token_type}, pero se obtuvo {self._peek_token.token_type}'
-
         self._errors.append(error)
 
-    def _parse_let_statement(self) -> Optional[LetStatement]:
+    def _parse_boolean(self) -> Boolean:
         assert self._current_token is not None
-        let_statement = LetStatement(token=self._current_token)
+        return Boolean(token=self._current_token, value=self._current_token.token_type == TokenType.TRUE)
+    
+    def _parse_block_statement(self) -> BlockStatement:
+        assert self._current_token is not None
+        statement = BlockStatement(token=self._current_token)
 
-        if not self._expected_token(TokenType.IDENT):
-            return None
+        self._advance_tokens()
 
-        let_statement.name = Identifier(
-            token=self._current_token, value=self._current_token.literal)
+        assert self._current_token is not None
+        statement.name = self._current_token
 
-        # TODO terminar cuando sepamos parsear expresiones
-        while self._current_token.token_type != TokenType.SEMICOLON:
+        self._advance_tokens()
+
+        assert self._current_token is not None
+        statement.block = self._parse_block()
+
+        return statement
+
+    def _parse_block(self) -> Block:
+        assert self._current_token is not None
+        block = Block(token=self._current_token)
+
+        self._advance_tokens()
+
+        assert self._current_token is not None
+        while self._current_token.token_type != TokenType.CLOSE_TAG:
+            statement = self._parse_statement()
+            if statement is not None:
+                block.statements.append(statement)
+
             self._advance_tokens()
 
-        return let_statement
+        return block
 
     def _parse_statement(self) -> Optional[Statement]:
         assert self._current_token is not None
-        if self._current_token.token_type == TokenType.CONTROL:
-            return self._parse_let_statement()
-        else:
-            return None
+        if self._current_token.token_type == TokenType.OPEN_TAG:
+            return self._parse_block_statement()

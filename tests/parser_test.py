@@ -3,9 +3,8 @@ from unittest import TestCase
 
 from controller.lexer import Lexer
 from controller.parser import Parser
-from controller.token import Token, TokenType
 from controller.ast import (
-    LetStatement,
+    BlockStatement,
     Program,
     Statement,
     Expression,
@@ -40,7 +39,7 @@ class ParserTest(TestCase):
 
         names: List[str] = []
         for statement in program.statements:
-            statement = cast(LetStatement, statement)
+            statement = cast(BlockStatement, statement)
             assert statement.name is not None
             names.append(statement.name.value)
 
@@ -59,12 +58,15 @@ class ParserTest(TestCase):
         parser.parse_program()
         print(parser.errors)
 
-        self.assertEqual(len(parser.errors), 2)
+        self.assertEqual(len(parser.errors), 1)
 
     def test_block_statement(self) -> None:
         source: str = '''
         <!-- Controles 
-        
+        Boton btn1;
+        Boton btn2;
+        Boton btn3;
+        Boton btn4;
         Controles
         -->
         '''
