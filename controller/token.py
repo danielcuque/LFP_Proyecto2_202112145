@@ -34,9 +34,17 @@ class TokenType(Enum):
 class Token(NamedTuple):
     token_type: TokenType
     literal: str
+    row: int = 0
+    column: int = 0
 
     def __str__(self) -> str:
         return f'Type: {self.token_type}, Literal: {self.literal}'
+
+    def set_row(self, row: int) -> None:
+        self.row = row
+
+    def set_column(self, column: int) -> None:
+        self.column = column
 
 
 def lookup_token_type(literal: str) -> TokenType:

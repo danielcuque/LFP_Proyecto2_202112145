@@ -195,7 +195,7 @@ class LexerTest(TestCase):
 
         expected_tokens: List[Token] = [
             Token(TokenType.OPEN_TAG, '<!--'),
-            Token(TokenType.IDENT, 'Controles'),
+            Token(TokenType.WRAPPER, 'Controles'),
             Token(TokenType.CLOSE_TAG, '-->'),
             Token(TokenType.EOF, ''),
         ]
@@ -214,13 +214,14 @@ class LexerTest(TestCase):
 
         tokens: List[Token] = []
 
-        for i in range(3):
+        for i in range(4):
             tokens.append(lexer.next_token())
 
         expected_tokens: List[Token] = [
             Token(TokenType.ILLEGAL, '<!-'),
-            Token(TokenType.IDENT, 'Controles'),
-            Token(TokenType.ILLEGAL, '->'),
+            Token(TokenType.WRAPPER, 'Controles'),
+            Token(TokenType.ILLEGAL, '-'),
+            Token(TokenType.ILLEGAL, '>'),
         ]
 
         self.assertEquals(tokens, expected_tokens)
@@ -250,38 +251,38 @@ class LexerTest(TestCase):
 
         expected_tokens: List[Token] = [
             Token(TokenType.OPEN_TAG, '<!--'),
-            Token(TokenType.IDENT, 'Controles'),
-            Token(TokenType.IDENT, 'Contenedor'),
+            Token(TokenType.WRAPPER, 'Controles'),
+            Token(TokenType.CONTROL, 'Contenedor'),
             Token(TokenType.IDENT, 'contlogin'),
             Token(TokenType.SEMICOLON, ';'),
-            Token(TokenType.IDENT, 'Contenedor'),
+            Token(TokenType.CONTROL, 'Contenedor'),
             Token(TokenType.IDENT, 'contFondo'),
             Token(TokenType.SEMICOLON, ';'),
-            Token(TokenType.IDENT, 'Boton'),
+            Token(TokenType.CONTROL, 'Boton'),
             Token(TokenType.IDENT, 'cmdIngresar'),
             Token(TokenType.SEMICOLON, ';'),
-            Token(TokenType.IDENT, 'Clave'),
+            Token(TokenType.CONTROL, 'Clave'),
             Token(TokenType.IDENT, 'pswClave'),
             Token(TokenType.SEMICOLON, ';'),
-            Token(TokenType.IDENT, 'Etiqueta'),
+            Token(TokenType.CONTROL, 'Etiqueta'),
             Token(TokenType.IDENT, 'passw'),
             Token(TokenType.SEMICOLON, ';'),
-            Token(TokenType.IDENT, 'Etiqueta'),
+            Token(TokenType.CONTROL, 'Etiqueta'),
             Token(TokenType.IDENT, 'Nombre'),
             Token(TokenType.SEMICOLON, ';'),
-            Token(TokenType.IDENT, 'Texto'),
+            Token(TokenType.CONTROL, 'Texto'),
             Token(TokenType.IDENT, 'Texto0'),
             Token(TokenType.SEMICOLON, ';'),
-            Token(TokenType.IDENT, 'Contenedor'),
+            Token(TokenType.CONTROL, 'Contenedor'),
             Token(TokenType.IDENT, 'contlogo2'),
             Token(TokenType.SEMICOLON, ';'),
-            Token(TokenType.IDENT, 'Contenedor'),
+            Token(TokenType.CONTROL, 'Contenedor'),
             Token(TokenType.IDENT, 'ContLogo1'),
             Token(TokenType.SEMICOLON, ';'),
-            Token(TokenType.IDENT, 'Contenedor'),
+            Token(TokenType.CONTROL, 'Contenedor'),
             Token(TokenType.IDENT, 'ContBody'),
             Token(TokenType.SEMICOLON, ';'),
-            Token(TokenType.IDENT, 'Controles'),
+            Token(TokenType.WRAPPER, 'Controles'),
             Token(TokenType.CLOSE_TAG, '-->'),
             Token(TokenType.EOF, ''),
         ]
@@ -345,7 +346,7 @@ class LexerTest(TestCase):
             tokens.append(lexer.next_token())
 
         expected_tokens: List[Token] = [
-            Token(TokenType.THIS, 'this'),
+            Token(TokenType.IDENT, 'this'),
             Token(TokenType.DOT, '.'),
             Token(TokenType.FUNCTION, 'add'),
             Token(TokenType.LPAREN, '('),

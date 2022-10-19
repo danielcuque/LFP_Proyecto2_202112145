@@ -113,9 +113,12 @@ def main():
                     '''
 
     lexer: Lexer = Lexer(source)
+    lexer.fill_table_of_tokens()
 
-    EOF_TOKEN = Token(TokenType.EOF, '')
-    while (token := lexer.next_token()) != EOF_TOKEN:
+    for token in lexer._table_of_invalid_tokens:
+        print(token)
+
+    for token in lexer._table_of_valid_tokens:
         print(token)
 
 
