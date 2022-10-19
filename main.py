@@ -3,7 +3,6 @@
 from typing import List
 
 from controller.lexer import Lexer
-from controller.token import Token, TokenType
 
 
 def main():

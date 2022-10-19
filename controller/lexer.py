@@ -24,15 +24,12 @@ class Lexer:
     def fill_table_of_tokens(self) -> None:
         while True:
             token = self.next_token()
-            token.set_column(self._column)
-            token.set_row(self._row)
 
             if token.token_type == TokenType.ILLEGAL:
                 self._table_of_invalid_tokens.append(token)
             else:
                 self._table_of_valid_tokens.append(token)
             if token.token_type == TokenType.EOF:
-                self._table_of_valid_tokens.append(token)
                 break
 
     _skip_characters: bool = False
