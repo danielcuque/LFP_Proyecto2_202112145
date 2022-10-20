@@ -175,3 +175,9 @@ class Lexer:
     def _skip_whitespace(self) -> None:
         while self._character.isspace():
             self._read_character()
+
+    def get_invalid_tokens(self) -> List[Token]:
+        return self._table_of_invalid_tokens
+
+    def get_valid_tokens(self) -> List[Token]:
+        return self._table_of_valid_tokens

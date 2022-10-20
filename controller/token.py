@@ -9,13 +9,14 @@ from typing import Dict, NamedTuple
 @unique
 class TokenType(Enum):
     """Token types"""
+    BOOLEAN = auto()
     CLOSE_TAG = auto()
     CLOSE_BLOCK_COMMENT = auto()
     COMMA = auto()
     CONTROL = auto()
     DOT = auto()
     EOF = auto()
-    FALSE = auto()
+    EMPTY = auto()
     FUNCTION = auto()
     IDENT = auto()
     INT = auto()
@@ -27,7 +28,6 @@ class TokenType(Enum):
     RPAREN = auto()
     SEMICOLON = auto()
     STRING = auto()
-    TRUE = auto()
     WRAPPER = auto()
 
 
@@ -79,7 +79,8 @@ def lookup_token_type(literal: str) -> TokenType:
         return keywords_control[literal]
 
     keywords: Dict[str, TokenType] = {
-        'true': TokenType.TRUE,
-        'false': TokenType.FALSE,
+        'true': TokenType.BOOLEAN,
+        'false': TokenType.BOOLEAN,
     }
+    
     return keywords.get(literal, TokenType.IDENT)
