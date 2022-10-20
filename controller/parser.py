@@ -27,6 +27,9 @@ class Error:
         self.token = token
         self.expected_token = expected_token
 
+    def __str__(self) -> str:
+        return f"Se esperaba {self.expected_token}, pero se recibió {self.expected_token}"
+
 
 class Parser:
 
@@ -73,33 +76,40 @@ class Parser:
             return True
         elif current_stack == NoTerminal.CALL_FUNCTION:
             self._append_state_two()
+            return True
+
         elif current_stack == NoTerminal.PARAMETERS:
             if current_token.token_type == TokenType.BOOLEAN:
-                pass
+                self._replace_top([
+                    TokenType.BOOLEAN,
+                ])
+                return True
+
             elif current_token.token_type == TokenType.INT:
                 self._replace_top([
-                    Token(TokenType.INT, ''),
+                    Token(TokenType.INT, '1'),
                     NoTerminal.PARAMETER,
                 ])
                 return True
 
             elif current_token.token_type == TokenType.STRING:
                 self._replace_top([
-                    Token(TokenType.STRING, ''),
+                    Token(TokenType.STRING, 'Esto es un string'),
                 ])
                 return True
             elif current_token.token_type == TokenType.JUSTIFY:
                 self._replace_top([
-                    Token(TokenType.JUSTIFY, ''),
+                    Token(TokenType.JUSTIFY, 'Centro'),
                 ])
                 return True
             elif current_token.token_type == TokenType.IDENT:
                 self._replace_top([
-                    Token(TokenType.IDENT, ''),
+                    Token(TokenType.IDENT, 'btn1'),
                 ])
                 return True
             self._errors.append(Error(current_token, [
                                 TokenType.BOOLEAN, TokenType.INT, TokenType.STRING, TokenType.JUSTIFY, TokenType.IDENT]))
+            self._stack.pop()
             return
 
         elif current_stack == NoTerminal.PARAMETER:
@@ -112,112 +122,102 @@ class Parser:
             self._stack.pop()
             return
 
-        # Terminals
-        elif current_stack.token_type == TokenType.OPEN_TAG \
-                and current_token.token_type == TokenType.OPEN_TAG:
+        # Terminal
+        elif current_stack.token_type == current_token.token_type:
+            if current_stack.token_type == TokenType.WRAPPER  and current_stack.literal.lower() != current_token.literal.lower():
+                self._errors.append(Error(current_token, [current_stack]))
+                self._stack.pop()
+                return False
 
-            self._stack.pop()
-            self._position += 1
-            return True
-
-        elif current_stack.token_type == TokenType.CLOSE_TAG \
-                and current_token.token_type == TokenType.CLOSE_TAG:
-
-            self._stack.pop()
-            self._position += 1
-            return True
-        elif current_stack.token_type == TokenType.WRAPPER \
-                and current_token.token_type == TokenType.WRAPPER:
-
-            self._stack.pop()
-            self._position += 1
-            return True
-        elif current_stack.token_type == TokenType.CONTROL \
-                and current_token.token_type == TokenType.CONTROL:
-
-            self._stack.pop()
-            self._position += 1
-            return True
-        elif current_stack.token_type == TokenType.IDENT \
-                and current_token.token_type == TokenType.IDENT:
-
-            self._stack.pop()
-            self._position += 1
-            return True
-        elif current_stack.token_type == TokenType.DOT \
-                and current_token.token_type == TokenType.DOT:
-
-            self._stack.pop()
-            self._position += 1
-            return True
-        elif current_stack.token_type == TokenType.FUNCTION \
-                and current_token.token_type == TokenType.FUNCTION:
-
-            self._stack.pop()
-            self._position += 1
-            return True
-
-        elif current_stack.token_type == TokenType.SEMICOLON \
-                and current_token.token_type == TokenType.SEMICOLON:
-            self._stack.pop()
-            self._position += 1
-            return True
-
-        elif current_stack.token_type == TokenType.COMMA \
-                and current_token.token_type == TokenType.COMMA:
-            self._stack.pop()
-            self._position += 1
-            return True
-
-        elif current_stack.token_type == TokenType.BOOLEAN \
-                and current_token.token_type == TokenType.BOOLEAN:
-            self._stack.pop()
-            self._position += 1
-            return True
-
-        elif current_stack.token_type == TokenType.INT \
-                and current_token.token_type == TokenType.INT:
-            self._stack.pop()
-            self._position += 1
-            return True
-
-        elif current_stack.token_type == TokenType.STRING \
-                and current_token.token_type == TokenType.STRING:
-            self._stack.pop()
-            self._position += 1
-            return True
-
-        elif current_stack.token_type == TokenType.JUSTIFY \
-                and current_token.token_type == TokenType.JUSTIFY:
-            self._stack.pop()
-            self._position += 1
-            return True
-
+            return self._pop_stack()
+        
         self._errors.append(Error(current_token, [current_stack]))
         self._stack.pop()
         return False
 
-    def _next_token(self):
-        pass
+        # elif current_stack.token_type == TokenType.BOOLEAN \
+        #         and current_token.token_type == TokenType.BOOLEAN:
+        #     return self._pop_stack()
+
+        # elif current_stack.token_type == TokenType.COMMA \
+        #         and current_token.token_type == TokenType.COMMA:
+        #     return self._pop_stack()
+
+        # elif current_stack.token_type == TokenType.CONTROL \
+        #         and current_token.token_type == TokenType.CONTROL:
+        #     return self._pop_stack()
+
+        # elif current_stack.token_type == TokenType.CLOSE_TAG \
+        #         and current_token.token_type == TokenType.CLOSE_TAG:
+        #     return self._pop_stack()
+
+        # elif current_stack.token_type == TokenType.DOT \
+        #         and current_token.token_type == TokenType.DOT:
+        #     return self._pop_stack()
+
+        # elif current_stack.token_type == TokenType.FUNCTION \
+        #         and current_token.token_type == TokenType.FUNCTION:
+        #     return self._pop_stack()
+
+        # elif current_stack.token_type == TokenType.IDENT \
+        #         and current_token.token_type == TokenType.IDENT:
+        #     return self._pop_stack()
+
+        # elif current_stack.token_type == TokenType.INT \
+        #         and current_token.token_type == TokenType.INT:
+        #     return self._pop_stack()
+        
+        # elif current_stack.token_type == TokenType.LPAREN \
+        #         and current_token.token_type == TokenType.LPAREN:
+        #     return self._pop_stack()
+
+
+        # elif current_stack.token_type == TokenType.OPEN_TAG \
+        #         and current_token.token_type == TokenType.OPEN_TAG:
+        #     return self._pop_stack()
+
+        # elif current_stack.token_type == TokenType.WRAPPER \
+        #         and current_token.token_type == TokenType.WRAPPER:
+
+        #     return self._pop_stack()
+
+        # elif current_stack.token_type == TokenType.SEMICOLON \
+        #         and current_token.token_type == TokenType.SEMICOLON:
+        #     return self._pop_stack()
+
+        # elif current_stack.token_type == TokenType.STRING \
+        #         and current_token.token_type == TokenType.STRING:
+        #     return self._pop_stack()
+
+        # elif current_stack.token_type == TokenType.JUSTIFY \
+        #         and current_token.token_type == TokenType.JUSTIFY:
+        #     return self._pop_stack()
+
+
+
+    def _pop_stack(self) -> bool:
+        self._stack.pop()
+        self._position += 1
+        return True
 
     def _append_state_zero(self) -> None:
         self._replace_top([
             Token(TokenType.OPEN_TAG, ''),
-            Token(TokenType.WRAPPER, ''),
+            Token(TokenType.WRAPPER, 'Controles'),
             NoTerminal.LET_STATEMENT,
-            Token(TokenType.WRAPPER, ''),
+            Token(TokenType.WRAPPER, 'Controles'),
             Token(TokenType.CLOSE_TAG, ''),
 
             Token(TokenType.OPEN_TAG, ''),
-            Token(TokenType.WRAPPER, ''),
+            Token(TokenType.WRAPPER, 'Propiedades'),
             NoTerminal.CALL_FUNCTION,
-            Token(TokenType.WRAPPER, ''),
+            Token(TokenType.WRAPPER, 'Propiedades'),
             Token(TokenType.CLOSE_TAG, ''),
 
             Token(TokenType.OPEN_TAG, ''),
-            Token(TokenType.WRAPPER, ''),
+            Token(TokenType.WRAPPER, 'Colocacion'),
             NoTerminal.CALL_FUNCTION,
-            Token(TokenType.WRAPPER, ''),
+            Token(TokenType.WRAPPER, 'Colocacion'),
             Token(TokenType.CLOSE_TAG, ''),
         ])
 
@@ -243,12 +243,6 @@ class Parser:
     def _append_state_three(self) -> None:
         self._replace_top([
             Token(TokenType.BOOLEAN, 'true'),
-        ])
-
-    def _append_state_four(self) -> None:
-        self._replace_top([
-            Token(TokenType.COMMA, ','),
-            NoTerminal.PARAMETERS, 'parameters'
         ])
 
     def _replace_top(self, nodes: List) -> None:

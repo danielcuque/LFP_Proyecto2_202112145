@@ -13,12 +13,9 @@ def main():
             Controles -->
 
             <!--propiedades
-
-            //#$inicio de contlogin 
             contlogin.setAncho(190); 
             contlogin.setAlto(150);
             contlogin.setColorFondo(47,79,79); 
-            //#$fin de contlogin
 
             //#$inicio de contFondo 
             contFondo.setAncho(800);
@@ -106,7 +103,8 @@ def main():
     parser: Parser = Parser(lexer.get_valid_tokens())
     parser.parse_programm()
 
-    print('A', parser.errors)
+    for error in parser.errors:
+        print(error)
 
 
 if __name__ == "__main__":
