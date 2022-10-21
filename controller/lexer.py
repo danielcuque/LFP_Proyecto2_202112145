@@ -24,6 +24,8 @@ class Lexer:
     def fill_table_of_tokens(self) -> None:
         while True:
             token = self.next_token()
+            token.row = self._row
+            token.column = self._column
 
             if token.token_type == TokenType.ILLEGAL:
                 self._table_of_invalid_tokens.append(token)

@@ -101,7 +101,7 @@ class App(ctk.CTk):
         # Add menus to menu bar
         self.exit_menu = Menu(self.menu_options, tearoff=0)
         self.exit_menu.add_command(
-            label="Salir", command=self.destroy, accelerator=f"{command_to_execute}+Q")
+            label="Salir", command=self.destroy, accelerator=f"{command_to_execute}+q")
 
         # Adding menus to menu bar
         self.menu_options.add_cascade(label="Archivo", menu=self.file_menu)
@@ -117,9 +117,18 @@ class App(ctk.CTk):
 
         self.create_short_cut()
 
-    def about_creator(self):
-        pass
-        # ShowCredits(master=self)
+    def destroy(self):
+        if messagebox.askokcancel("Salir", "¿Desea salir de la aplicación?"):
+            if self.PATH_FILE:
+                self.save_file()
+            super().destroy()
+
+    def new_file(self) -> None:
+        self.PATH_FILE = ""
+        if self.entry_information.get("1.0", "end-1c"):
+            if messagebox.askyesno("Nuevo archivo", "¿Desea guardar el archivo actual?"):
+                self.save_file()
+            self.entry_information.delete("1.0", "end")
 
     def open_file(self):
         path_file = filedialog.askopenfilename(
@@ -153,20 +162,9 @@ class App(ctk.CTk):
             save_information(path_to_save, information)
             self.PATH_FILE = path_to_save
 
-    def destroy(self):
-        if messagebox.askokcancel("Salir", "¿Desea salir de la aplicación?"):
-            if self.PATH_FILE:
-                self.save_file()
-            super().destroy()
-
     def create_short_cut(self):
-        # self.bind_all("<Command-e>", lambda event: self.show_errors())
-        self.bind_all("<Command-o>", lambda event: self.open_file())
-        # self.bind_all("<Command-p>", lambda event: self.show_results())
-        self.bind_all("<Command-q>", lambda event: self.destroy())
-        self.bind_all("<Command-s>", lambda event: self.save_file())
-        self.bind_all("<Command-Shift-s>", lambda event: self.save_file_as())
-        self.bind_all("<Command-r>", lambda event: self.scanner())
-        self.bind_all("<Command-t>", lambda event: self.about_creator())
-        self.bind_all("<Command-Shift-t>", lambda event: self.about_creator())
-        self.bind_all("<Command-Shift-u>", lambda event: self.about_creator())
+        # Meny Files
+        self.bind_all('<Control-n>', self.new_file)
+        self.bind_all('<Control-o>', self.open_file)
+        self.bind_all('<Control-s>', self.save_file)
+        self.bind_all('<Control-S>', self.save_file_as)
