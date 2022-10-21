@@ -27,7 +27,7 @@ class Lexer:
 
             if token.token_type == TokenType.ILLEGAL:
                 self._table_of_invalid_tokens.append(token)
-            else:
+            elif token.token_type != TokenType.OPEN_BLOCK_COMMENT and token.token_type != TokenType.CLOSE_BLOCK_COMMENT:
                 self._table_of_valid_tokens.append(token)
             if token.token_type == TokenType.EOF:
                 break
@@ -175,3 +175,9 @@ class Lexer:
     def _skip_whitespace(self) -> None:
         while self._character.isspace():
             self._read_character()
+
+    def get_invalid_tokens(self) -> List[Token]:
+        return self._table_of_invalid_tokens
+
+    def get_valid_tokens(self) -> List[Token]:
+        return self._table_of_valid_tokens

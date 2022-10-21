@@ -3,33 +3,21 @@
 from typing import List
 
 from controller.lexer import Lexer
+from controller.parser import Parser
 
 
 def main():
     source: str = '''
                     <!-- Controles
             Contenedor contlogin;
-            Contenedor contFondo; 
-            Boton cmdIngresar; 
-            Clave pswClave;
-            Etiqueta passw;
-            Etiqueta Nombre;
-            Texto Texto0;
-            Contenedor contlogo2;
-            Contenedor ContLogo1;
-            Contenedor ContBody;
+            Boton btnlogin;
+            Etiqueta lblusuario;
             Controles -->
 
             <!--propiedades
-            /*
-            Definicion de propiedades
-            */
-
-            //#$inicio de contlogin 
             contlogin.setAncho(190); 
-            contlogin.setAlto(150);
-            contlogin.setColorFondo(47,79,79); 
-            //#$fin de contlogin
+            contlogin1.setAlto(150);
+            btn1.setColorFondo(47,79,79); 
 
             //#$inicio de contFondo 
             contFondo.setAncho(800);
@@ -114,11 +102,11 @@ def main():
     lexer: Lexer = Lexer(source)
     lexer.fill_table_of_tokens()
 
-    for token in lexer._table_of_invalid_tokens:
-        print(token)
+    parser: Parser = Parser(lexer.get_valid_tokens())
+    parser.parse_programm()
 
-    for token in lexer._table_of_valid_tokens:
-        print(token)
+    for error in parser.errors:
+        print(error)
 
 
 if __name__ == "__main__":
