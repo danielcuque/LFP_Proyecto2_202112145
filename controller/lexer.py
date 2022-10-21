@@ -27,7 +27,7 @@ class Lexer:
 
             if token.token_type == TokenType.ILLEGAL:
                 self._table_of_invalid_tokens.append(token)
-            else:
+            elif token.token_type != TokenType.OPEN_BLOCK_COMMENT and token.token_type != TokenType.CLOSE_BLOCK_COMMENT:
                 self._table_of_valid_tokens.append(token)
             if token.token_type == TokenType.EOF:
                 break

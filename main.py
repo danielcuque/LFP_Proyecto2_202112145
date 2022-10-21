@@ -10,12 +10,14 @@ def main():
     source: str = '''
                     <!-- Controles
             Contenedor contlogin;
+            Boton btnlogin;
+            Etiqueta lblusuario;
             Controles -->
 
             <!--propiedades
             contlogin.setAncho(190); 
-            contlogin.setAlto(150);
-            contlogin.setColorFondo(47,79,79); 
+            contlogin1.setAlto(150);
+            btn1.setColorFondo(47,79,79); 
 
             //#$inicio de contFondo 
             contFondo.setAncho(800);
