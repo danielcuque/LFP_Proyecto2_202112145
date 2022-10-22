@@ -32,8 +32,9 @@ class TokenType(Enum):
 
 
 class Token:
-    token_type: TokenType
-    literal: str
+    def __init__(self, token_type: TokenType, literal: str):
+        self.token_type = token_type
+        self.literal = literal
     row: int = 0
     column: int = 0
 

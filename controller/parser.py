@@ -24,11 +24,11 @@ class NoTerminal(Enum):
 
 class Error:
     def __init__(self, token, expected_token) -> None:
-        self.token = token
-        self.expected_token = expected_token
+        self.token: Optional[Token] = token
+        self.expected_token: Optional[Token] = expected_token
 
     def __str__(self) -> str:
-        return f"Se esperaba {self.expected_token}, pero se recibió {self.token}"
+        return f"Se esperaba {self.expected_token.literal}, pero se recibió {self.token.literal} en la línea {self.token.row} y columna {self.token.column}."
 
 
 class Parser:
@@ -71,7 +71,7 @@ class Parser:
             if current_token.token_type == TokenType.CONTROL:
                 self._append_state_one()
                 return True
-                
+
             self._stack.pop()
             return True
 
@@ -79,7 +79,7 @@ class Parser:
             if current_token.token_type == TokenType.IDENT:
                 self._append_state_two()
                 return True
-            
+
             self._stack.pop()
             return True
 

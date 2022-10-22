@@ -3,7 +3,8 @@ from tkinter import (
     filedialog,
     Menu,
     messagebox,
-    Text
+    Text,
+    ttk
 )
 
 import customtkinter as ctk
@@ -11,6 +12,7 @@ from typing import List
 
 # Data
 from controller.lexer import Lexer
+from controller.parser import Parser
 from controller.token import Token
 
 # Model
@@ -36,7 +38,6 @@ class App(ctk.CTk):
     PATH_FILE: str = ""
     VALID_TOKENS: List[Token] = []
     INVALID_TOKENS: List[Token] = []
-    RESULT_OF_OPERATIONS: List[str] = []
 
     def __init__(self):
         super().__init__()
@@ -63,6 +64,7 @@ class App(ctk.CTk):
         # create 2x1 grid system
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, minsize=100)
 
         # Menu
         self.menu_options = Menu(self)
@@ -80,23 +82,19 @@ class App(ctk.CTk):
         self.file_menu.add_command(
             label="Guardar como", command=self.save_file_as, accelerator=f"{command_to_execute}+Shift+S")
 
-        # Menu Tools
-        self.scanner_menu = Menu(self.menu_options, tearoff=0)
-        self.scanner_menu.add_command(
-            label="Analizar", command=self.about_creator, accelerator=f"{command_to_execute}+r")
-        self.scanner_menu.add_command(
-            label="Resultados", command=self.about_creator, accelerator=f'{command_to_execute}+p')
-        self.scanner_menu.add_command(
-            label="Errores", command=self.about_creator, accelerator=f'{command_to_execute}+e')
+        self.file_menu.add_separator()
+        self.file_menu.add_command(
+            label='Salir', command=self.destroy, accelerator=f"{command_to_execute}+Q")
 
-        # Menu Help
-        self.help_menu = Menu(self.menu_options, tearoff=0)
-        self.help_menu.add_command(
-            label="Guía de usuario", command=self.about_creator, accelerator=f"{command_to_execute}+U")
-        self.help_menu.add_command(
-            label="Guía técnica", command=self.about_creator, accelerator=f"{command_to_execute}+T")
-        self.help_menu.add_command(
-            label="Temas de ayuda", command=self.about_creator, accelerator=f'{command_to_execute}+t')
+        # Menu Tools
+        self.analizer_menu = Menu(self.menu_options, tearoff=0)
+        self.analizer_menu.add_command(
+            label='Ejecutar', command=self.run_program, accelerator=f"{command_to_execute}+r")
+
+        # Menu Tokens
+        self.tokens_menu = Menu(self.menu_options, tearoff=0)
+        self.tokens_menu.add_command(
+            label='Ver tokens', command=self.show_tokens, accelerator=f"{command_to_execute}+t")
 
         # Add menus to menu bar
         self.exit_menu = Menu(self.menu_options, tearoff=0)
@@ -106,16 +104,49 @@ class App(ctk.CTk):
         # Adding menus to menu bar
         self.menu_options.add_cascade(label="Archivo", menu=self.file_menu)
         self.menu_options.add_cascade(
-            label="Analizador", menu=self.scanner_menu)
-        self.menu_options.add_cascade(label="Ayuda", menu=self.help_menu)
-        self.menu_options.add_cascade(label="Salir", menu=self.exit_menu)
+            label="Analizador", menu=self.analizer_menu)
+        self.menu_options.add_cascade(
+            label='Tokens', menu=self.tokens_menu)
 
         ''' ====== Information frame ====== '''
         self.entry_information = Text(self, width=50)
         self.entry_information.grid(
             row=0, column=1, sticky="nsew", padx=10, pady=10)
-
+        
+        self.create_error_frame()
         self.create_short_cut()
+
+    def create_error_frame(self) -> None:
+        self.treeview = ttk.Treeview(self)
+
+        self.treeview['columns'] = (
+            'Tipo de error',
+            'Posición',
+            'Se esperaba',
+            'Descripción del error'
+        )
+
+        self.treeview.column("#0", width=0, stretch="NO")
+        self.treeview.column("Tipo de error", anchor="center", width=100)
+        self.treeview.column("Posición", anchor="center", width=100)
+        self.treeview.column("Se esperaba", anchor="center", width=100)
+        self.treeview.column("Descripción del error",
+                             anchor="center", width=100)
+
+        self.treeview.heading("#0", text="", anchor="w")
+        self.treeview.heading(
+            "Tipo de error", text="Tipo de error", anchor="w")
+        self.treeview.heading("Posición", text="Posición", anchor="w")
+        self.treeview.heading("Se esperaba", text="Se esperaba", anchor="w")
+        self.treeview.heading("Descripción del error",
+                              text="Descripción del error", anchor="w")
+
+        self.list_errors()
+
+        self.treeview.grid(row=1, column=1, sticky="nsew", padx=10, pady=10)
+
+    def list_errors(self) -> None:
+        pass
 
     def destroy(self):
         if messagebox.askokcancel("Salir", "¿Desea salir de la aplicación?"):
@@ -162,9 +193,36 @@ class App(ctk.CTk):
             save_information(path_to_save, information)
             self.PATH_FILE = path_to_save
 
+    def show_tokens(self) -> None:
+        pass
+
+    def run_program(self):
+        code: str = self.entry_information.get("1.0", "end-1c")
+        if code:
+            lexer: Lexer = Lexer(code)
+            lexer.fill_table_of_tokens()
+            self.INVALID_TOKENS = lexer.get_invalid_tokens()
+            self.VALID_TOKENS = lexer.get_valid_tokens()
+
+            if len(self.VALID_TOKENS) > 0:
+                parser: Parser = Parser(self.VALID_TOKENS)
+                parser.parse_programm()
+
+                print(parser._stack)
+                for error in parser._errors:
+                    print(error)
+        else:
+            messagebox.showerror("Error", "No hay código para analizar")
+
     def create_short_cut(self):
         # Meny Files
-        self.bind_all('<Control-n>', self.new_file)
-        self.bind_all('<Control-o>', self.open_file)
-        self.bind_all('<Control-s>', self.save_file)
-        self.bind_all('<Control-S>', self.save_file_as)
+        self.bind_all("<Command-n>", lambda event: self.new_file())
+        self.bind_all("<Command-o>", lambda event: self.open_file())
+        self.bind_all("<Command-s>", lambda event: self.save_file())
+        self.bind_all("<Command-Shift-s>", lambda event: self.save_file_as())
+
+        # Menu Analizer
+        self.bind_all("<Command-r>", lambda event: self.run_program())
+
+        # Menu Tokens
+        self.bind_all("<Command-t>", lambda event: self.show_tokens())
