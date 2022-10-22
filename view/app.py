@@ -12,7 +12,7 @@ from typing import List
 
 # Data
 from controller.lexer import Lexer
-from controller.parser import Parser
+from controller.parser import Error, Parser
 from controller.token import Token
 
 # Model
@@ -38,6 +38,7 @@ class App(ctk.CTk):
     PATH_FILE: str = ""
     VALID_TOKENS: List[Token] = []
     INVALID_TOKENS: List[Token] = []
+    PARSER_ERROR: List[Error] = []
 
     def __init__(self):
         super().__init__()

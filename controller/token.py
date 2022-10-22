@@ -39,7 +39,7 @@ class Token:
     column: int = 0
 
     def __str__(self) -> str:
-        return f'Type: {self.token_type}, Literal: {self.literal} at row: {self.row}, column: {self.column}'
+        return f'Type: {self.token_type.name}, Literal: {self.literal} at row: {self.row}, column: {self.column}'
 
 
 def lookup_token_type(literal: str) -> TokenType:

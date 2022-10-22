@@ -25,10 +25,13 @@ class NoTerminal(Enum):
 class Error:
     def __init__(self, token, expected_token) -> None:
         self.token: Optional[Token] = token
-        self.expected_token: Optional[Token] = expected_token
+        self.expected_token: Optional[List[Token]] = expected_token
 
     def __str__(self) -> str:
-        return f"Se esperaba {self.expected_token.literal}, pero se recibió {self.token.literal} en la línea {self.token.row} y columna {self.token.column}."
+        error: str = ''
+        for item in self.expected_token:
+            error += f'{item} '        
+        return f"Se esperaba {error}, pero se recibió {self.token.literal}"
 
 
 class Parser:
