@@ -4,8 +4,10 @@ from tkinter import (
     Menu,
     messagebox,
     Text,
-    ttk
+    ttk,
 )
+
+
 
 import customtkinter as ctk
 from typing import List
@@ -32,7 +34,7 @@ ctk.set_default_color_theme("blue")
 class App(ctk.CTk):
 
     # Size of the window
-    APP_WIDTH: int = 1300
+    APP_WIDTH: int = 1400
     APP_HEIGHT: int = 700
 
     PATH_FILE: str = ""
@@ -128,13 +130,13 @@ class App(ctk.CTk):
         )
 
         self.treeview.column("#0", width=0, stretch="NO")
-        self.treeview.column("Tipo de error", anchor="center", width=100)
-        self.treeview.column("Posición", anchor="center", width=100)
-        self.treeview.column("Se esperaba", anchor="center", width=100)
+        self.treeview.column("Tipo de error", anchor="w", width=50)
+        self.treeview.column("Posición", anchor="w", width=80)
+        self.treeview.column("Se esperaba", anchor="w")
         self.treeview.column("Descripción del error",
-                             anchor="center", width=100)
+                             anchor="w")
 
-        self.treeview.heading("#0", text="", anchor="w")
+        self.treeview.heading("#0", text="", anchor="center")
         self.treeview.heading(
             "Tipo de error", text="Tipo de error", anchor="w")
         self.treeview.heading("Posición", text="Posición", anchor="w")
@@ -160,8 +162,7 @@ class App(ctk.CTk):
                 'Sintáctico',
                 f'Fila: {error.token.row}, Columna: {error.token.column}',
                 str(error),
-                'Sentencia mal formada {}'.format(
-                    error)
+                'Sentencia mal formada'
             ))
 
     def destroy(self):
