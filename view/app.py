@@ -22,6 +22,7 @@ from model.helpers.ManageInformation import (
     read_information,
     save_information
 )
+from view.token_table import TokenTable
 
 # # Modes: "System" (standard), "Dark", "Light"
 ctk.set_appearance_mode("dark")
@@ -85,7 +86,7 @@ class App(ctk.CTk):
     def create_menu(self) -> None:
         # Menu
         self.menu_options = Menu(self)
-        self.config(menu=self.menu_options)
+        self.configure(menu=self.menu_options)
 
         # Menu File
 
@@ -228,10 +229,15 @@ class App(ctk.CTk):
         self.refresh_path_file()
 
     def show_tokens(self) -> None:
-        pass
+        if len(self.INVALID_TOKENS) > 0 or len(self.VALID_TOKENS) > 0:
+            all_tokens: List[Token] = self.VALID_TOKENS + self.INVALID_TOKENS
+            TokenTable(self, all_tokens)
+        else:
+            messagebox.showerror(
+                "Error", "Ejecute el analizador para ver los tokens")
 
     def refresh_path_file(self) -> None:
-        self.info_label.config(text=f'Archivo: {self.PATH_FILE}')
+        self.info_label.configure(text=f'Archivo: {self.PATH_FILE}')
 
     def run_program(self):
         code: str = self.entry_information.get("1.0", "end-1c")
