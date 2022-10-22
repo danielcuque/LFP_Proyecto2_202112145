@@ -8,7 +8,6 @@ from tkinter import (
 )
 
 
-
 import customtkinter as ctk
 from typing import List
 
@@ -49,13 +48,13 @@ class App(ctk.CTk):
         self.minsize(self.APP_WIDTH, self.APP_HEIGHT)
         self.protocol("WM_DELETE_WINDOW", self.destroy)
 
-        command_to_execute = ""
+        self.command_to_execute = ""
         my_os = system()
 
         if my_os == "Windows":
-            command_to_execute = "Ctrl"
+            self.command_to_execute = "Ctrl"
         elif my_os == "Darwin":
-            command_to_execute = "Cmd"
+            self.command_to_execute = "Cmd"
 
         # Position of the app
         self.geometry(get_window_position(self.winfo_screenwidth(
@@ -63,46 +62,67 @@ class App(ctk.CTk):
 
         self.title("Analizador")
 
-        # Custom grid layout (2x1)
-        # create 2x1 grid system
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, minsize=100)
+        self.create_menu()
 
+        # Custom grid layout (3x1)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_rowconfigure(0, minsize=12)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(2, minsize=100)
+
+        self.info_label = ctk.CTkLabel(
+            self, text=f"Archivo: Ninguno ", text_font=("Arial", 12))
+        self.info_label.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
+
+        ''' ====== Information frame ====== '''
+        self.entry_information = Text(self, width=50)
+        self.entry_information.grid(
+            row=1, column=1, sticky="nsew", padx=10, pady=10)
+
+        self.create_error_frame()
+        self.create_short_cut()
+
+    def create_menu(self) -> None:
         # Menu
         self.menu_options = Menu(self)
         self.config(menu=self.menu_options)
 
         # Menu File
+
         self.file_menu = Menu(self.menu_options, tearoff=0)
-        self.file_menu.add_command(label="Abrir", command=self.open_file,
-                                   accelerator=f"{command_to_execute}+O")
+        self.file_menu.add_command(label='Nuevo archivo de texto', command=self.new_file,
+                                   accelerator=f"{self.command_to_execute}+n")
+
+        self.file_menu.add_separator()
+
+        self.file_menu.add_command(label="Abrir...", command=self.open_file,
+                                   accelerator=f"{self.command_to_execute}+O")
 
         self.file_menu.add_separator()
 
         self.file_menu.add_command(
-            label="Guardar", command=self.save_file, accelerator=f'{command_to_execute}+S')
+            label="Guardar", command=self.save_file, accelerator=f'{self.command_to_execute}+S')
         self.file_menu.add_command(
-            label="Guardar como", command=self.save_file_as, accelerator=f"{command_to_execute}+Shift+S")
+            label="Guardar como", command=self.save_file_as, accelerator=f"{self.command_to_execute}+Shift+S")
 
         self.file_menu.add_separator()
         self.file_menu.add_command(
-            label='Salir', command=self.destroy, accelerator=f"{command_to_execute}+Q")
+            label='Salir', command=self.destroy, accelerator=f"{self.command_to_execute}+Q")
 
         # Menu Tools
         self.analizer_menu = Menu(self.menu_options, tearoff=0)
         self.analizer_menu.add_command(
-            label='Ejecutar', command=self.run_program, accelerator=f"{command_to_execute}+r")
+            label='Ejecutar', command=self.run_program, accelerator=f"{self.command_to_execute}+r")
 
         # Menu Tokens
         self.tokens_menu = Menu(self.menu_options, tearoff=0)
         self.tokens_menu.add_command(
-            label='Ver tokens', command=self.show_tokens, accelerator=f"{command_to_execute}+t")
+            label='Ver tokens', command=self.show_tokens, accelerator=f"{self.command_to_execute}+t")
 
         # Add menus to menu bar
         self.exit_menu = Menu(self.menu_options, tearoff=0)
         self.exit_menu.add_command(
-            label="Salir", command=self.destroy, accelerator=f"{command_to_execute}+q")
+            label="Salir", command=self.destroy, accelerator=f"{self.command_to_execute}+q")
 
         # Adding menus to menu bar
         self.menu_options.add_cascade(label="Archivo", menu=self.file_menu)
@@ -110,14 +130,6 @@ class App(ctk.CTk):
             label="Analizador", menu=self.analizer_menu)
         self.menu_options.add_cascade(
             label='Tokens', menu=self.tokens_menu)
-
-        ''' ====== Information frame ====== '''
-        self.entry_information = Text(self, width=50)
-        self.entry_information.grid(
-            row=0, column=1, sticky="nsew", padx=10, pady=10)
-
-        self.create_error_frame()
-        self.create_short_cut()
 
     def create_error_frame(self) -> None:
         self.treeview = ttk.Treeview(self)
@@ -144,7 +156,16 @@ class App(ctk.CTk):
         self.treeview.heading("Descripción del error",
                               text="Descripción del error", anchor="w")
 
-        self.treeview.grid(row=1, column=1, sticky="nsew", padx=10, pady=10)
+        self.treeview.grid(row=2, column=1, sticky="nsew", padx=10, pady=10)
+
+    def destroy(self):
+        if messagebox.askokcancel("Salir", "¿Desea salir de la aplicación?"):
+            if self.PATH_FILE:
+                self.save_file()
+            super().destroy()
+
+    def generate_code(self) -> None:
+        pass
 
     def list_errors(self) -> None:
         self.treeview.delete(*self.treeview.get_children())
@@ -165,22 +186,16 @@ class App(ctk.CTk):
                 'Sentencia mal formada'
             ))
 
-    def destroy(self):
-        if messagebox.askokcancel("Salir", "¿Desea salir de la aplicación?"):
-            if self.PATH_FILE:
-                self.save_file()
-            super().destroy()
-
     def new_file(self) -> None:
-        self.PATH_FILE = ""
         if self.entry_information.get("1.0", "end-1c"):
             if messagebox.askyesno("Nuevo archivo", "¿Desea guardar el archivo actual?"):
                 self.save_file()
             self.entry_information.delete("1.0", "end")
+        self.save_file_as()
 
     def open_file(self):
         path_file = filedialog.askopenfilename(
-            initialdir="/", title="Select file", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
+            initialdir="/", title="Select file", filetypes=(("Text files", "*.gpw"), ("all files", "*.*")))
         if len(path_file) <= 0:
             messagebox.showerror(
                 "Error", "No se ha seleccionado ningún archivo")
@@ -188,30 +203,35 @@ class App(ctk.CTk):
             self.PATH_FILE = path_file
             uploaded_information: str = read_information(
                 self.PATH_FILE)
-
-            if len(uploaded_information) <= 0:
-                messagebox.showerror(
-                    "Error", "No se ha podido cargar el archivo")
-            else:
-                self.show_info_file(uploaded_information)
+            self.show_info_file(uploaded_information)
 
     def show_info_file(self, uploaded_information: str):
+        self.entry_information.delete("1.0", "end")
         self.entry_information.insert("1.0", uploaded_information)
+        self.refresh_path_file()
 
     def save_file(self):
-        information: str = self.entry_information.get("1.0", "end-1c")
-        save_information(self.PATH_FILE, information)
+        if self.PATH_FILE:
+            information: str = self.entry_information.get("1.0", "end-1c")
+            save_information(self.PATH_FILE, information)
+        else:
+            self.save_file_as()
 
     def save_file_as(self):
         path_to_save = filedialog.asksaveasfilename(
-            initialdir="/", title="Select file", filetypes=(("Text files", "*.txt"), ("all files", "*.*")))
+            initialdir="/", title="Guardar como", filetypes=(("Text files", "*.gpw"), ("all files", "*.*")))
         if len(path_to_save) > 0:
             information: str = self.entry_information.get("1.0", "end-1c")
             save_information(path_to_save, information)
             self.PATH_FILE = path_to_save
 
+        self.refresh_path_file()
+
     def show_tokens(self) -> None:
         pass
+
+    def refresh_path_file(self) -> None:
+        self.info_label.config(text=f'Archivo: {self.PATH_FILE}')
 
     def run_program(self):
         code: str = self.entry_information.get("1.0", "end-1c")
@@ -227,6 +247,9 @@ class App(ctk.CTk):
                 self.PARSER_ERROR = parser.errors
 
             self.list_errors()
+
+        if len(self.INVALID_TOKENS) == 0 and len(self.PARSER_ERROR) == 0:
+            self.generate_code()
 
         else:
             messagebox.showerror("Error", "No hay código para analizar")

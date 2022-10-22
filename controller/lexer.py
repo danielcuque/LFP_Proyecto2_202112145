@@ -37,6 +37,10 @@ class Lexer:
     _skip_characters: bool = False
 
     def next_token(self) -> Token:
+        if self._character == '\n':
+            self._row += 1
+            self._column = 0
+
         self._skip_whitespace()
 
         if self._skip_characters:
@@ -73,6 +77,7 @@ class Lexer:
             token = self._read_open_tag()
         elif self._character == '-':
             token = self._read_close_tag()
+
         elif self._character == '*':
             if self._peek_character() == '/':
                 token = self._make_two_character_token(
@@ -113,9 +118,9 @@ class Lexer:
         else:
             self._character = self._source[self._read_position]
 
+        self._column += 1
         self._position = self._read_position
         self._read_position += 1
-        self._column += 1
 
     def _read_close_tag(self) -> Token:
         initial_position = self._position
@@ -173,9 +178,6 @@ class Lexer:
 
     def _skip_whitespace(self) -> None:
         while self._character.isspace():
-            if self._character == '\n':
-                self._row += 1
-                self._column = 0
             self._read_character()
 
     def get_invalid_tokens(self) -> List[Token]:
