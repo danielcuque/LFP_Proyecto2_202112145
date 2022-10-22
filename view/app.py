@@ -32,7 +32,7 @@ ctk.set_default_color_theme("blue")
 class App(ctk.CTk):
 
     # Size of the window
-    APP_WIDTH: int = 1096
+    APP_WIDTH: int = 1300
     APP_HEIGHT: int = 700
 
     PATH_FILE: str = ""
@@ -113,7 +113,7 @@ class App(ctk.CTk):
         self.entry_information = Text(self, width=50)
         self.entry_information.grid(
             row=0, column=1, sticky="nsew", padx=10, pady=10)
-        
+
         self.create_error_frame()
         self.create_short_cut()
 
@@ -142,12 +142,27 @@ class App(ctk.CTk):
         self.treeview.heading("Descripción del error",
                               text="Descripción del error", anchor="w")
 
-        self.list_errors()
-
         self.treeview.grid(row=1, column=1, sticky="nsew", padx=10, pady=10)
 
     def list_errors(self) -> None:
-        pass
+        self.treeview.delete(*self.treeview.get_children())
+
+        for error_lexicon in self.INVALID_TOKENS:
+            self.treeview.insert('', 'end', text="", values=(
+                'Léxico',
+                f'Fila: {error_lexicon.row}, Columna: {error_lexicon.column}',
+                '',
+                f'La expresión {str(error_lexicon)} no es valido'
+            ))
+
+        for error in self.PARSER_ERROR:
+            self.treeview.insert('', 'end', text="", values=(
+                'Sintáctico',
+                f'Fila: {error.token.row}, Columna: {error.token.column}',
+                str(error),
+                'Sentencia mal formada {}'.format(
+                    error)
+            ))
 
     def destroy(self):
         if messagebox.askokcancel("Salir", "¿Desea salir de la aplicación?"):
@@ -208,10 +223,10 @@ class App(ctk.CTk):
             if len(self.VALID_TOKENS) > 0:
                 parser: Parser = Parser(self.VALID_TOKENS)
                 parser.parse_programm()
+                self.PARSER_ERROR = parser.errors
 
-                print(parser._stack)
-                for error in parser._errors:
-                    print(error)
+            self.list_errors()
+
         else:
             messagebox.showerror("Error", "No hay código para analizar")
 

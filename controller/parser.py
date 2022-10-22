@@ -31,7 +31,7 @@ class Error:
         error: str = ''
         for item in self.expected_token:
             error += f'{item} '        
-        return f"Se esperaba {error}, pero se recibió {self.token.literal}"
+        return f"Se esperaba {str(error)}, pero se recibió {self.token.literal}"
 
 
 class Parser:
