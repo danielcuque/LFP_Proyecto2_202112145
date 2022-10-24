@@ -1,23 +1,32 @@
+from typing import Tuple
 from .token import Token
 
 
 class ObjectHTML:
     def __init__(self, id_control: Token) -> None:
         self.id_control = id_control
-        self.width = 100
+        self.background_color = (255, 255, 255)
+        self.group: Token = None
         self.height = 100
+        self.width = 100
 
     def get_id(self) -> str:
         return self.id_control.literal
 
-    def __str__(self) -> str:
-        return f'{self.id_control.literal}'
-    
     def set_width(self, width: int) -> None:
         self.width = width
-    
+
     def set_height(self, height: int) -> None:
         self.height = height
+
+    def set_background_color(self, colors: Tuple) -> None:
+        self.background_color = colors
+    
+    def set_group(self, group: Token) -> None:
+        self.group = group
+
+    def __str__(self) -> str:
+        return f'{self.id_control.literal}'
 
 
 class Button(ObjectHTML):
@@ -36,18 +45,14 @@ class Button(ObjectHTML):
 class CheckBox(ObjectHTML):
     def __init__(self, id_control: Token) -> None:
         super().__init__(id_control)
-        self.text: str = ""
         self.checked: bool = False
-        self.group: str = ""
+        self.text: str = ""
 
     def set_text(self, text: str) -> None:
         self.text = text
 
     def set_checked(self, checked: bool) -> None:
         self.checked = checked
-
-    def set_group(self, group: str) -> None:
-        self.group = group
 
 
 class Container(ObjectHTML):
@@ -72,18 +77,14 @@ class Container(ObjectHTML):
 class RadioButton(ObjectHTML):
     def __init__(self, id_control: Token) -> None:
         super().__init__(id_control)
-        self.text: str = ""
         self.checked: bool = False
-        self.group: str = ""
+        self.text: str = ""
 
     def set_text(self, text: str) -> None:
         self.text = text
 
     def set_checked(self, checked: bool) -> None:
         self.checked = checked
-
-    def set_group(self, group: str) -> None:
-        self.group = group
 
 
 class Tag(ObjectHTML):

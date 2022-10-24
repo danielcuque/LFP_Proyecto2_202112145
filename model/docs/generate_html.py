@@ -1,5 +1,5 @@
 from tkinter import filedialog
-from typing import List
+from typing import List, Tuple
 from controller.token import Token, TokenType
 from controller.object import (
     Button,
@@ -40,6 +40,9 @@ class GenerateHTML:
 
         self._generate_objects()
 
+    def _lookup_prop(self, index: int, position: int) -> Token:
+        return self._properties[index+position]
+
     def _generate_objects(self) -> str:
         for index in range(len(self._controls)):
             token: Token = self._controls[index]
@@ -78,26 +81,61 @@ class GenerateHTML:
             if token.token_type == TokenType.IDENT:
                 object_html: ObjectHTML = self._search_object(token.literal)
                 if object_html is not None:
-                    if self._properties[index+2].literal == 'setAncho':
-                        object_html.set_width(int(self._properties[index+4].literal))
+                    current_function: str = self._lookup_prop(index, 2).literal
+                    if current_function == 'setAncho':
+                        object_html.set_width(
+                            int(self._lookup_prop(index, 4).literal))
                         continue
-                    elif self._properties[index+2].literal == 'setAlto':
-                        object_html.set_height(int(self._properties[index+4].literal))
+
+                    elif current_function == 'setAlto':
+                        object_html.set_height(
+                            int(self._lookup_prop(index, 4).literal))
                         continue
-                    if type(object_html) == Button:
-                        pass
-                    elif type(object_html) == CheckBox:
-                        pass
-                    elif type(object_html) == Container:
-                        pass
-                    elif type(object_html) == Tag:
-                        pass
-                    elif type(object_html) == RadioButton:
-                        pass
-                    elif type(object_html) == TextField:
-                        pass
-                    elif type(object_html) == TextArea:
-                        pass
+
+                    elif current_function == 'setColorFondo':
+                        background_colors: Tuple[str, str] = (
+                            self._lookup_prop(index, 4), self._lookup_prop(index, 6), self._lookup_prop(index, 8))
+                        object_html.set_background_color(background_colors)
+                        continue
+
+                    elif current_function == 'setTexto':
+                        object_html.set_text(
+                            self._lookup_prop(index, 4).literal)
+                        continue
+                    elif current_function == 'setAlineacion':
+                        object_html.set_align(
+                            self._lookup_prop(index, 4).literal)
+                        continue
+                    elif current_function == 'setColorLetra':
+                        color: Tuple[str, str] = (
+                            self._lookup_prop(index, 4).literal, self._lookup_prop(index, 6).literal)
+                        object_html.set_color_letter(color)
+                        continue
+                    elif current_function == 'setMarcada':
+                        object_html.set_checked(True)
+                        continue
+                    elif current_function == 'setGrupo':
+                        object_html.set_group(
+                            self._lookup_prop(index, 4))
+                        continue
+
+                    # if type(object_html) == Button:
+                    #     pass
+                    # elif type(object_html) == CheckBox:
+                    #     pass
+                    # elif type(object_html) == Container:
+                    #     pass
+                    # elif type(object_html) == Tag:
+                    #     pass
+                    # elif type(object_html) == RadioButton:
+                    #     pass
+                    # elif type(object_html) == TextField:
+                    #     pass
+                    # elif type(object_html) == TextArea:
+                    #     pass
+    
+    def _set_position(self) -> None:
+        pass
 
     def _search_object(self, name: str) -> ObjectHTML:
         for object_html in self._table_of_symbols:
