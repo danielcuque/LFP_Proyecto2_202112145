@@ -254,8 +254,8 @@ class App(ctk.CTk):
 
             self.list_errors()
 
-        if len(self.INVALID_TOKENS) == 0 and len(self.PARSER_ERROR) == 0:
-            self.generate_code()
+            if len(self.INVALID_TOKENS) == 0 and len(self.PARSER_ERROR) == 0:
+                self.generate_code()
 
         else:
             messagebox.showerror("Error", "No hay código para analizar")
