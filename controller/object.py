@@ -9,6 +9,7 @@ class ObjectHTML:
         self.group: Token = None
         self.height = 100
         self.width = 100
+        self._position: Tuple[int, int] = (0, 0)
 
     def get_id(self) -> str:
         return self.id_control.literal
@@ -21,9 +22,15 @@ class ObjectHTML:
 
     def set_background_color(self, colors: Tuple) -> None:
         self.background_color = colors
-    
+
     def set_group(self, group: Token) -> None:
         self.group = group
+
+    def set_position(self, position: Tuple[int, int]) -> None:
+        self._position = position
+    
+    def get_group(self) -> str:
+        return self.group.literal
 
     def __str__(self) -> str:
         return f'{self.id_control.literal}'
@@ -33,7 +40,7 @@ class Button(ObjectHTML):
     def __init__(self, id_control: Token) -> None:
         super().__init__(id_control)
         self.text: str = ""
-        self.justify: str = "center"
+        self.justify: str = ""
 
     def set_text(self, text: str) -> None:
         self.text = text
@@ -60,6 +67,9 @@ class Container(ObjectHTML):
         super().__init__(id_control)
         self.color_background: str = "white"
         self.controls: list[ObjectHTML] = []
+
+    def add(self, control: ObjectHTML) -> None:
+        self.controls.append(control)
 
     def set_color_background(self, color: str) -> None:
         self.color_background = color
