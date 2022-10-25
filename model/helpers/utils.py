@@ -1,7 +1,7 @@
 from typing import Dict
 
 
-def lookup_justify(self, literal: str) -> str:
+def lookup_justify(literal: str) -> str:
     literal = literal.lower()
     types_justify: Dict[str, str] = {
         'centro': 'center',

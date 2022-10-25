@@ -15,7 +15,7 @@ from typing import List
 from controller.lexer import Lexer
 from controller.parser import Error, Parser
 from controller.token import Token
-from model.docs.generate_html import GenerateHTML
+from model.docs.generate_file import GenerateFile
 
 # Model
 from model.helpers.WindowPosition import get_window_position
@@ -168,7 +168,7 @@ class App(ctk.CTk):
 
     def generate_code(self) -> None:
         if self.PATH_FILE and len(self.VALID_TOKENS) > 0:
-            doc = GenerateHTML(self.VALID_TOKENS, self.PATH_FILE)
+            doc = GenerateFile(self.VALID_TOKENS, self.PATH_FILE)
             doc.generate_file()
             messagebox.showinfo(
                 "Código generado", "El código ha sido generado correctamente")

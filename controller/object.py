@@ -131,7 +131,7 @@ class TextField(ObjectHTML):
         super().__init__(id_control)
         self.text: str = ""
         self.justify: str = "center"
-        is_password: bool = False
+        self.is_password: bool = False
 
     def set_text(self, text: str) -> None:
         self.text = text

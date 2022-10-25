@@ -17,7 +17,7 @@ from ..helpers.utils import (
 )
 
 
-class GenerateHTML:
+class GenerateFile:
     def __init__(self, table_of_tokens: List[Token], path_file: str) -> None:
         self._table_of_tokens = table_of_tokens
         self._table_of_symbols: List[ObjectHTML] = []
@@ -158,52 +158,120 @@ class GenerateHTML:
                 return object_html
         return None
 
+    def _get_css_code(self) -> None:
+        content: str = ''
+        for object_html in self._table_of_symbols:
+            if isinstance(object_html, Container):
+                pass
+        
+            
+
+    @staticmethod
     def _get_button(button: Button) -> str:
         return f'<input type="submit" id="{button.get_id()}" value="{button.text}" style="text-align: {lookup_justify(button.justify)} />'
 
+    @staticmethod
     def _get_checkbox(checkbox: CheckBox) -> str:
         return f'<input type="checkbox" id="{checkbox.get_id()}" value="{checkbox.text}" {checkbox.checked} > {checkbox.text} </input>'
 
-    def _container(container: Container) -> str:
-        return f'<div id="{container.get_id()}"> </div>'
+    def _get_container(self, container: Container) -> str:
+        content: str = ""
+        for object_html in container.controls:
+            if isinstance(object_html, Button):
+                content += self._get_button(object_html)
+            elif isinstance(object_html, CheckBox):
+                content += self._get_checkbox(object_html)
+            elif isinstance(object_html, Tag):
+                content += self._get_tag(object_html)
+            elif isinstance(object_html, RadioButton):
+                content += self._get_radio_button(object_html)
+            elif isinstance(object_html, TextField):
+                content += self._get_text_field(object_html)
+            elif isinstance(object_html, TextArea):
+                content += self._get_text_area(object_html)
+            elif isinstance(object_html, Container):
+                content += self._get_container(object_html)
+        return f'<div id="{container.get_id()}"> {content} </div>'
 
-    def _radio_button(radiobutton: RadioButton) -> str:
-        return f'<input type="radio" id="{radiobutton.get_id()}" name="{radiobutton.group}"> {radiobutton.text} </input>'
+    @staticmethod
+    def _get_radio_button(radiobutton: RadioButton) -> str:
+        return f'<input type="radio" id="{radiobutton.get_id()}" name="{radiobutton.group.literal}"> {radiobutton.text} </input>'
 
+    @staticmethod
     def _get_tag(tag: Tag) -> str:
-        return f'<label id="{tag.get_id()}>{tag.text}</label>"'
+        return f'<label id="{tag.get_id()}">{tag.text}</label>'
 
+    @staticmethod
     def _get_text_area(textarea: TextArea) -> str:
-        return f'<textarea id="{textarea.get_id()}>{textarea.text}</textarea>"'
+        return f'<textarea id="{textarea.get_id()}">{textarea.text}</textarea>"'
 
+    @staticmethod
     def _get_text_field(textfield: TextField) -> str:
         input_type: str = "text"
         if textfield.is_password:
             input_type = "password"
-        return f'<input type={input_type} id="{textfield.get_id()}>{textfield.text}</input>"'
+        return f'<input type="{input_type}" id="{textfield.get_id()}">{textfield.text}</input>"'
 
     def _header_html(self) -> str:
-        header: str = ''''
-        <html>
-            <head>
-            <link href="prueba.css" rel="stylesheet" type="text/css" />
-            </head>
+        header: str = f'''
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link rel="stylesheet" href="{self._get_name_file()}.css">
+            <title>{self._get_name_file()}</title>
+        </head>
         '''
+        return header
 
     def body_html(self) -> str:
         body: str = f'''
         <body>
-        {self._generate_body()}
-        </body>
+            {self._generate_body()}
+            </body>
+        </html>
         '''
+        return body
 
     def _get_name_file(self) -> str:
         return self.path_file.split('/')[-1].split('.')[0]
 
     def _generate_body(self) -> str:
-        pass
+        content: str = ""
+        for control in self._body_container:
+            if isinstance(control, Button):
+                content += self._get_button(control)
+            elif isinstance(control, CheckBox):
+                content += self._get_checkbox(control)
+            elif isinstance(control, Tag):
+                content += self._get_tag(control)
+            elif isinstance(control, RadioButton):
+                content += self._get_radio_button(control)
+            elif isinstance(control, TextField):
+                content += self._get_text_field(control)
+            elif isinstance(control, TextArea):
+                content += self._get_text_area(control)
+            elif isinstance(control, Container):
+                content += self._get_container(control)
+        return content
 
     def generate_file(self) -> None:
         path_file: str = filedialog.askdirectory()
         if path_file != '':
-            pass
+            self._generate_html(path_file)
+            self._generate_css_file(path_file)
+
+    def _generate_html(self, path_file: str) -> None:
+        name_file: str = self._get_name_file()
+        with open(f'{path_file}/{name_file}.html', 'w') as file:
+            file.write(self._header_html())
+            file.write(self.body_html())
+            file.close()
+    
+    def _generate_css_file(self, path_file: str) -> None:
+        name_file: str = self._get_name_file()
+        with open(f'{path_file}/{name_file}.css', 'w') as file:
+            file.write(self._get_css_code())
+            file.close()
