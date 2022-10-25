@@ -1,5 +1,5 @@
 from tkinter import filedialog
-from typing import List, Tuple, cast
+from typing import List, Tuple, Optional
 from controller.token import Token, TokenType
 from controller.object import (
     Button,
@@ -46,7 +46,8 @@ class GenerateFile:
 
         self._generate_objects()
 
-    def _lookup_prop(self, list_to_search: List, index: int, position: int) -> Token:
+    @staticmethod
+    def _lookup_prop(list_to_search: List, index: int, position: int) -> Token:
         return list_to_search[index+position]
 
     def _generate_objects(self) -> str:
@@ -102,8 +103,12 @@ class GenerateFile:
                         continue
 
                     elif current_function == 'setColorFondo':
-                        background_colors: Tuple[str, str] = (
-                            self._lookup_prop(self._properties, index, 4), self._lookup_prop(self._properties, index, 6), self._lookup_prop(self._properties, index, 8))
+                        background_colors: Tuple[int, int, int] = (
+                            int(self._lookup_prop(
+                                self._properties, index, 4).literal),
+                            int(self._lookup_prop(
+                                self._properties, index, 6).literal),
+                            int(self._lookup_prop(self._properties, index, 8).literal))
                         object_html.set_background_color(background_colors)
                         continue
 
@@ -116,8 +121,12 @@ class GenerateFile:
                             self._lookup_prop(self._properties, index, 4).literal)
                         continue
                     elif current_function == 'setColorLetra':
-                        color: Tuple[str, str] = (
-                            self._lookup_prop(self._properties, index, 4).literal, self._lookup_prop(self._properties, index, 6).literal)
+                        color: Tuple[int, int, int] = (
+                            int(self._lookup_prop(
+                                self._properties, index, 4).literal),
+                            int(self._lookup_prop(
+                                self._properties, index, 6).literal),
+                            int(self._lookup_prop(self._properties, index, 8).literal))
                         object_html.set_color_letter(color)
                         continue
                     elif current_function == 'setMarcada':
@@ -132,7 +141,7 @@ class GenerateFile:
         for index in range(len(self._positon)):
             token: Token = self._positon[index]
             if token.token_type == TokenType.IDENT:
-                current_function: Token = self._lookup_prop(
+                current_function: str = self._lookup_prop(
                     self._positon, index, 2).literal
                 if current_function == 'add':
                     object_html: ObjectHTML = self._search_object(
@@ -140,7 +149,7 @@ class GenerateFile:
                     if token.literal == 'this':
                         self._body_container.append(object_html)
                     else:
-                        container: Container = self._search_object(
+                        container: Optional[Container] = self._search_object(
                             token.literal)
                         container.add(object_html)
 
@@ -151,28 +160,49 @@ class GenerateFile:
                         position: Tuple[int, int] = (
                             int(self._lookup_prop(self._positon, index, 4).literal), int(self._lookup_prop(self._positon, index, 6).literal))
                         object_html.set_position(position)
+                        object_html._is_absolute = True
 
-    def _search_object(self, name: str) -> ObjectHTML:
+    def _search_object(self, name: str) -> Optional[ObjectHTML]:
         for object_html in self._table_of_symbols:
             if object_html.get_id() == name:
                 return object_html
         return None
 
-    def _get_css_code(self) -> None:
+    def _get_css_code(self) -> str:
         content: str = ''
         for object_html in self._table_of_symbols:
-            if isinstance(object_html, Container):
-                pass
-        
-            
+            content += f'#{object_html.get_id()} {{\n' \
+                       f'width:{object_html.width}px;\n' \
+                       f'height:{object_html.height}px;\n' \
+
+            if object_html.get_is_absolute():
+                content += f'position:absolute;\n' \
+
+            if type(object_html.background_color) is tuple:
+                content += f'background-color: rgb{object_html.background_color[0], object_html.background_color[1], object_html.background_color[2]};\n' \
+
+            if type(object_html.get_position()) is tuple:
+                content += f'left:{object_html.get_position()[0]}px;\n' \
+                           f'top:{object_html.get_position()[1]}px;\n'
+
+            if isinstance(object_html, Tag):
+                content += f'color: rgb{object_html.color_letter[0], object_html.color_letter[1], object_html.color_letter[2]};\n' \
+                    f'font-size: 12px;\n' \
+
+
+            content += f'}}\n'
+
+        return content
 
     @staticmethod
     def _get_button(button: Button) -> str:
-        return f'<input type="submit" id="{button.get_id()}" value="{button.text}" style="text-align: {lookup_justify(button.justify)} />'
+        return f'<input type="submit" id="{button.get_id()}" value="{button.text}" style="text-align: {lookup_justify(button.justify)}" />\n'
 
     @staticmethod
     def _get_checkbox(checkbox: CheckBox) -> str:
-        return f'<input type="checkbox" id="{checkbox.get_id()}" value="{checkbox.text}" {checkbox.checked} > {checkbox.text} </input>'
+        checked: str = 'checked' if checkbox.checked else ''
+        return f'<input type="checkbox" id="{checkbox.get_id()}" value="{checkbox.text}" ' \
+               f'{checked} > {checkbox.text} </input>\n'
 
     def _get_container(self, container: Container) -> str:
         content: str = ""
@@ -195,22 +225,23 @@ class GenerateFile:
 
     @staticmethod
     def _get_radio_button(radiobutton: RadioButton) -> str:
-        return f'<input type="radio" id="{radiobutton.get_id()}" name="{radiobutton.group.literal}"> {radiobutton.text} </input>'
+        checked: str = 'checked' if radiobutton.checked else ''
+        return f'<input type="radio" id="{radiobutton.get_id()}" name="{radiobutton.group.literal}" {checked} > {radiobutton.text} </input>\n'
 
     @staticmethod
     def _get_tag(tag: Tag) -> str:
-        return f'<label id="{tag.get_id()}">{tag.text}</label>'
+        return f'<label id="{tag.get_id()}">{tag.text}</label>\n'
 
     @staticmethod
     def _get_text_area(textarea: TextArea) -> str:
-        return f'<textarea id="{textarea.get_id()}">{textarea.text}</textarea>"'
+        return f'<textarea id="{textarea.get_id()}">{textarea.text}</textarea>\n'
 
     @staticmethod
     def _get_text_field(textfield: TextField) -> str:
         input_type: str = "text"
         if textfield.is_password:
             input_type = "password"
-        return f'<input type="{input_type}" id="{textfield.get_id()}">{textfield.text}</input>"'
+        return f'<input type="{input_type}" id="{textfield.get_id()}" value="{textfield.text}"/>\n'
 
     def _header_html(self) -> str:
         header: str = f'''
@@ -269,7 +300,7 @@ class GenerateFile:
             file.write(self._header_html())
             file.write(self.body_html())
             file.close()
-    
+
     def _generate_css_file(self, path_file: str) -> None:
         name_file: str = self._get_name_file()
         with open(f'{path_file}/{name_file}.css', 'w') as file:

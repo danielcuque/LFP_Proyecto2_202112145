@@ -5,14 +5,18 @@ from .token import Token
 class ObjectHTML:
     def __init__(self, id_control: Token) -> None:
         self.id_control = id_control
-        self.background_color = (255, 255, 255)
+        self.background_color = ''
         self.group: Token = None
-        self.height = 100
+        self.height = 25
         self.width = 100
-        self._position: Tuple[int, int] = (0, 0)
+        self._position = None
+        self._is_absolute = False
 
     def get_id(self) -> str:
         return self.id_control.literal
+
+    def get_position(self) -> Tuple[int, int]:
+        return self._position
 
     def set_width(self, width: int) -> None:
         self.width = width
@@ -20,7 +24,7 @@ class ObjectHTML:
     def set_height(self, height: int) -> None:
         self.height = height
 
-    def set_background_color(self, colors: Tuple) -> None:
+    def set_background_color(self, colors: Tuple[int, int, int]) -> None:
         self.background_color = colors
 
     def set_group(self, group: Token) -> None:
@@ -31,6 +35,9 @@ class ObjectHTML:
 
     def get_group(self) -> str:
         return self.group.literal
+    
+    def get_is_absolute(self) -> bool:
+        return self._is_absolute
 
     def __str__(self) -> str:
         return f'{self.id_control.literal}'
@@ -65,14 +72,10 @@ class CheckBox(ObjectHTML):
 class Container(ObjectHTML):
     def __init__(self, id_control: Token) -> None:
         super().__init__(id_control)
-        self.color_background: str = "white"
         self.controls: List[ObjectHTML] = []
 
     def add(self, control: ObjectHTML) -> None:
         self.controls.append(control)
-
-    def set_color_background(self, color: str) -> None:
-        self.color_background = color
 
     def set_height(self, height: int) -> None:
         self.height = height
@@ -97,14 +100,14 @@ class RadioButton(ObjectHTML):
 class Tag(ObjectHTML):
     def __init__(self, id_control: Token) -> None:
         super().__init__(id_control)
-        self.color_letter: str = "black"
+        self.color_letter: Tuple[int, int, int] = (0, 0, 0)
         self.text: str = ""
         self.color_background: str = "white"
 
     def set_text(self, text: str) -> None:
         self.text = text
 
-    def set_color_letter(self, color: str) -> None:
+    def set_color_letter(self, color: Tuple[int, int, int]) -> None:
         self.color_letter = color
 
     def set_color_background(self, color: str) -> None:
