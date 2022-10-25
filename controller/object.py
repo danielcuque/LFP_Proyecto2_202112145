@@ -35,7 +35,7 @@ class ObjectHTML:
 
     def get_group(self) -> str:
         return self.group.literal
-    
+
     def get_is_absolute(self) -> bool:
         return self._is_absolute
 

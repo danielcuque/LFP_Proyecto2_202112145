@@ -130,7 +130,10 @@ class GenerateFile:
                         object_html.set_color_letter(color)
                         continue
                     elif current_function == 'setMarcada':
-                        object_html.set_checked(True)
+                        operator: str = self._lookup_prop(
+                            self._properties, index, 4).literal
+                        if operator.lower() == 'true':
+                            object_html.set_checked(True)
                         continue
                     elif current_function == 'setGrupo':
                         object_html.set_group(

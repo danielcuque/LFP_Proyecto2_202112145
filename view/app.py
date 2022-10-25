@@ -76,6 +76,10 @@ class App(ctk.CTk):
             self, text=f"Archivo: Ninguno ", text_font=("Arial", 12))
         self.info_label.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
 
+        self.position_label = ctk.CTkLabel(
+            self, text="Línea: 0 Columna: 0", text_font=("Arial", 12))
+        self.position_label.grid(row=0, column=1, sticky="w", padx=10, pady=10)
+
         ''' ====== Information frame ====== '''
         self.entry_information = Text(self, width=50)
         self.entry_information.grid(
@@ -248,6 +252,11 @@ class App(ctk.CTk):
     def refresh_path_file(self) -> None:
         self.info_label.configure(text=f'Archivo: {self.PATH_FILE}')
 
+    def refresh_position(self, event) -> None:
+        self.position_label.configure(
+            text=f'Fila: {event.widget.index("insert").split(".")[0]}, Columna: {event.widget.index("insert").split(".")[1]}')
+
+
     def run_program(self):
         code: str = self.entry_information.get("1.0", "end-1c")
         if code:
@@ -281,3 +290,6 @@ class App(ctk.CTk):
 
         # Menu Tokens
         self.bind_all("<Command-t>", lambda event: self.show_tokens())
+
+        # Bind text
+        self.entry_information.bind("<KeyRelease>", self.refresh_position)
