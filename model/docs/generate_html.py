@@ -70,8 +70,9 @@ class GenerateHTML:
                     self._table_of_symbols.append(
                         TextField(self._controls[index + 1]))
                 elif literal == 'clave':
-                    self._table_of_symbols.append(
-                        TextArea(self._controls[index + 1]))
+                    clave: TextField = TextField(self._controls[index + 1])
+                    clave.set_is_password(True)
+                    self._table_of_symbols.append(clave)
                 elif literal == 'contenedor':
                     self._table_of_symbols.append(
                         Container(self._controls[index + 1]))
@@ -81,7 +82,6 @@ class GenerateHTML:
 
         self._set_properties()
         self._set_position()
-        print(self._body_container)
 
     def _set_properties(self) -> None:
         for index in range(len(self._properties)):
@@ -135,17 +135,15 @@ class GenerateHTML:
                 current_function: Token = self._lookup_prop(
                     self._positon, index, 2).literal
                 if current_function == 'add':
+                    object_html: ObjectHTML = self._search_object(
+                        self._lookup_prop(self._positon, index, 4).literal)
                     if token.literal == 'this':
-                        object_html: ObjectHTML = self._search_object(
-                            self._lookup_prop(self._positon, index, 4).literal)
                         self._body_container.append(object_html)
                     else:
-                        object_html: ObjectHTML = self._search_object(
+                        container: Container = self._search_object(
                             token.literal)
-                        if object_html is not None and type(object_html) == Container:
-                            object_html = cast(Container, object_html)
-                            object_html.add(
-                                self._search_object(self._lookup_prop(self._positon, index, 4)))
+                        container.add(object_html)
+
                 elif current_function == 'setPosicion':
                     object_html: ObjectHTML = self._search_object(
                         token.literal)
@@ -177,9 +175,12 @@ class GenerateHTML:
 
     def _get_text_area(textarea: TextArea) -> str:
         return f'<textarea id="{textarea.get_id()}>{textarea.text}</textarea>"'
-    
+
     def _get_text_field(textfield: TextField) -> str:
-        return f'<input type="text" id="{textfield.get_id()}>{textfield.text}</input>"'
+        input_type: str = "text"
+        if textfield.is_password:
+            input_type = "password"
+        return f'<input type={input_type} id="{textfield.get_id()}>{textfield.text}</input>"'
 
     def _header_html(self) -> str:
         header: str = ''''

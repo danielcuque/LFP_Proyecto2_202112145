@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import List, Tuple
 from .token import Token
 
 
@@ -28,7 +28,7 @@ class ObjectHTML:
 
     def set_position(self, position: Tuple[int, int]) -> None:
         self._position = position
-    
+
     def get_group(self) -> str:
         return self.group.literal
 
@@ -66,16 +66,13 @@ class Container(ObjectHTML):
     def __init__(self, id_control: Token) -> None:
         super().__init__(id_control)
         self.color_background: str = "white"
-        self.controls: list[ObjectHTML] = []
+        self.controls: List[ObjectHTML] = []
 
     def add(self, control: ObjectHTML) -> None:
         self.controls.append(control)
 
     def set_color_background(self, color: str) -> None:
         self.color_background = color
-
-    def add_control(self, control: ObjectHTML) -> None:
-        self.controls.append(control)
 
     def set_height(self, height: int) -> None:
         self.height = height
@@ -134,9 +131,13 @@ class TextField(ObjectHTML):
         super().__init__(id_control)
         self.text: str = ""
         self.justify: str = "center"
+        is_password: bool = False
 
     def set_text(self, text: str) -> None:
         self.text = text
 
     def set_justify(self, justify: str) -> None:
         self.justify = justify
+
+    def set_is_password(self, is_password: bool) -> None:
+        self.is_password = is_password
