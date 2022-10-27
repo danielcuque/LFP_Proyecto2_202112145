@@ -3,7 +3,7 @@ from enum import (
     auto,
     unique,
 )
-from typing import Dict, NamedTuple
+from typing import Dict
 
 
 @unique
@@ -31,12 +31,15 @@ class TokenType(Enum):
     WRAPPER = auto()
 
 
-class Token(NamedTuple):
-    token_type: TokenType
-    literal: str
+class Token:
+    def __init__(self, token_type: TokenType, literal: str):
+        self.token_type = token_type
+        self.literal = literal
+    row: int = 0
+    column: int = 0
 
     def __str__(self) -> str:
-        return f'Type: {self.token_type}, Literal: {self.literal}'
+        return f'tipo {self.token_type.name}, y literal "{self.literal}"'
 
 
 def lookup_token_type(literal: str) -> TokenType:

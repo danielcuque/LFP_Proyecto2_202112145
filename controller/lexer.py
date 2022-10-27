@@ -24,6 +24,8 @@ class Lexer:
     def fill_table_of_tokens(self) -> None:
         while True:
             token = self.next_token()
+            token.row = self._row
+            token.column = self._column
 
             if token.token_type == TokenType.ILLEGAL:
                 self._table_of_invalid_tokens.append(token)
@@ -35,12 +37,17 @@ class Lexer:
     _skip_characters: bool = False
 
     def next_token(self) -> Token:
+        if self._character == '\n':
+            self._row += 1
+            self._column = 0
+
         self._skip_whitespace()
 
         if self._skip_characters:
             while (self._character != '*' or self._peek_character() != '/') and self._character != '':
                 self._read_character()
                 self._skip_characters = False
+
         if self._character == '(':
             token = Token(TokenType.LPAREN, self._character)
         elif self._character == ')':
@@ -70,6 +77,7 @@ class Lexer:
             token = self._read_open_tag()
         elif self._character == '-':
             token = self._read_close_tag()
+
         elif self._character == '*':
             if self._peek_character() == '/':
                 token = self._make_two_character_token(
@@ -109,10 +117,6 @@ class Lexer:
             self._character = ''
         else:
             self._character = self._source[self._read_position]
-
-        if self._character == '\n':
-            self._row += 1
-            self._column = 0
 
         self._column += 1
         self._position = self._read_position

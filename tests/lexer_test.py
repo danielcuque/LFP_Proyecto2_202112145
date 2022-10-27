@@ -20,8 +20,6 @@ class LexerTest(TestCase):
         for i in range(len(source)):
             tokens.append(lexer.next_token())
 
-        print(tokens)
-
         expected_tokens: List[Token] = [
             Token(TokenType.ILLEGAL, '!'),
             Token(TokenType.ILLEGAL, '/'),
@@ -289,7 +287,6 @@ class LexerTest(TestCase):
 
         self.assertEquals(tokens, expected_tokens)
 
-    
     def test_strings(self) -> None:
         source: str = '''
             "Password 1";
@@ -356,8 +353,3 @@ class LexerTest(TestCase):
         ]
 
         self.assertEquals(tokens, expected_tokens)
-
-
-
-
-        
