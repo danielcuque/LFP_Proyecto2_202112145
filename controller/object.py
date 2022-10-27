@@ -118,15 +118,11 @@ class TextArea(ObjectHTML):
     def __init__(self, id_control: Token) -> None:
         super().__init__(id_control)
         self.text: str = ""
-        self.justify: str = "center"
         self.width: int = 150
         self.height: int = 150
 
     def set_text(self, text: str) -> None:
         self.text = text
-
-    def set_justify(self, justify: str) -> None:
-        self.justify = justify
 
 
 class TextField(ObjectHTML):

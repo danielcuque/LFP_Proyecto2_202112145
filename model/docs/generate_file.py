@@ -188,6 +188,9 @@ class GenerateFile:
                 content += f'left:{object_html.get_position()[0]}px;\n' \
                            f'top:{object_html.get_position()[1]}px;\n'
 
+            if isinstance(object_html, Button) or isinstance(object_html,TextField):
+                content += f'text-align: {lookup_justify(object_html.justify)}' \
+
             if isinstance(object_html, Tag):
                 content += f'color: rgb{object_html.color_letter[0], object_html.color_letter[1], object_html.color_letter[2]};\n' \
                     f'font-size: 12px;\n' \
@@ -199,7 +202,7 @@ class GenerateFile:
 
     @staticmethod
     def _get_button(button: Button) -> str:
-        return f'<input type="submit" id="{button.get_id()}" value="{button.text}" style="text-align: {lookup_justify(button.justify)}" />\n'
+        return f'<input type="submit" id="{button.get_id()}" value="{button.text}" />\n'
 
     @staticmethod
     def _get_checkbox(checkbox: CheckBox) -> str:
